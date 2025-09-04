@@ -102,9 +102,11 @@ App runs at: http://localhost:5173
 
 
 
-👨‍💻 Author
-Joaquín Morillas
-🔗 LinkedIn | 🐙 GitHub
+## 👨‍💻 Author
+**Joaquín Morillas**
+
+[![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JoaquinMorillas)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joaquin-morillas-7b97b1254/)
 
 
 # 📙 README (Español)
@@ -213,9 +215,11 @@ npm run dev
 La app corre en: http://localhost:5173
 
 
-👨‍💻 Autor
-Joaquín Morillas
-🔗 LinkedIn | 🐙 GitHub
+##👨‍💻 Autor
+**Joaquín Morillas**
+
+[![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JoaquinMorillas)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joaquin-morillas-7b97b1254/)
 
 
 ---
