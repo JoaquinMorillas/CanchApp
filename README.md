@@ -98,6 +98,7 @@ npm install
 npm run dev
 ```
 App runs at: http://localhost:5173
+To enter the Adim panel go to:  http://localhost:5173/administracion
 
 
 
@@ -213,6 +214,8 @@ npm install
 npm run dev
 ```
 La app corre en: http://localhost:5173
+Para acceder al panel de administración dirigirse a:  http://localhost:5173/administracion
+
 
 
 ##👨‍💻 Autor
