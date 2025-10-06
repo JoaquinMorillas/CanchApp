@@ -1,0 +1,19 @@
+/*
+:root {
+  --bs-primary: #3FA34D;      /*Green (Primary buttons, etc.) 
+  --bs-secondary: #4DA8DA;    /* Sky Blue 
+  --bs-warning: #F4C430;      /* Yellow accent 
+  --bs-dark: #2B2D42;
+  --bs-light: #F8F9FA;
+  --bs-border-color: #CED4DA;
+}
+*/
+:root{
+  
+  --bs-primary: #38B000;    /* Fresh Green */
+  --bs-secondary: #3D5A80;  /* Muted Deep Blue */
+  --bs-warning: #FFB703;    /* Warm Yellow */
+  --bs-dark: #1D1E2C;       /* Charcoal Dark */
+  --bs-light: #F0F1F6;      /* Off-White / Soft Light */
+  --bs-border-color: #D3D3E2; /* Light Grayish Blue */
+}

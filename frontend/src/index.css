@@ -1,0 +1,9 @@
+:root {
+ --bs-primary: #54cb1c;    /* Fresh Green */
+  --bs-secondary: #3D5A80;  /* Muted Deep Blue */
+  --bs-warning: #FFB703;    /* Warm Yellow */
+  --bs-dark: #1D1E2C;       /* Charcoal Dark */
+  --bs-light: #F0F1F6;      /* Off-White / Soft Light */
+  --bs-border-color: #D3D3E2; /* Light Grayish Blue */
+
+}
