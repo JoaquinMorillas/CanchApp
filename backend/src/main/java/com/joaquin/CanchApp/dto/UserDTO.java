@@ -1,6 +1,7 @@
 package com.joaquin.CanchApp.dto;
 
 import java.util.List;
+import java.util.Set;
 
 import com.joaquin.CanchApp.entity.Role;
 
@@ -18,4 +19,5 @@ public class UserDTO {
     private Role role;
     private List<ReservationDTO> reservations;
     private List<StablishmentDTO> stablishments;
+    private Set<StablishmentDTO> favoritesStablishments;
 }

@@ -2,18 +2,24 @@ package com.joaquin.CanchApp.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.joaquin.CanchApp.dto.StablishmentDTO;
 import com.joaquin.CanchApp.dto.UserDTO;
 import com.joaquin.CanchApp.entity.Role;
+import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.EmailAlreadyExistsExcepction;
+import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.UserEmailNotFoundException;
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
+import com.joaquin.CanchApp.mapper.StablishmentMapper;
 import com.joaquin.CanchApp.mapper.UserMapper;
+import com.joaquin.CanchApp.repository.StablishmentRepository;
 import com.joaquin.CanchApp.repository.UserRepository;
 
 
@@ -22,6 +28,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private StablishmentRepository stablishmentRepository;
 
     public UserDTO saveUser(User user) throws EmailAlreadyExistsExcepction{
         Optional<User> searchedUser = userRepository.findByEmail(user.getEmail());
@@ -105,6 +113,44 @@ public class UserService {
         
         userRepository.save(userToUpdate);
         return UserMapper.toDTO(userToUpdate);
+    }
+
+    public UserDTO addFavorite(Integer userId, Integer stablishmentId) throws StablishmentIdNotFoundException, UserIdNotFoundException{
+        User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UserIdNotFoundException(userId));
+        
+        Stablishment stablishment = stablishmentRepository.findById(stablishmentId)
+        .orElseThrow(() -> new StablishmentIdNotFoundException(stablishmentId));
+
+        Set<Stablishment> favorites = user.getFavoritesStablishments();
+        
+        favorites.add(stablishment);
+
+        user.setFavoritesStablishments(favorites);
+
+        User updatedUser = userRepository.save(user);
+
+        return UserMapper.toDTO(updatedUser);
+    }
+
+    public UserDTO deleteFavorite(Integer userId, Integer stablishmentId) throws UserIdNotFoundException, StablishmentIdNotFoundException{
+
+        User user = userRepository.findById(userId)
+        .orElseThrow(()-> new UserIdNotFoundException(userId));
+
+        Stablishment stablishment = stablishmentRepository.findById(stablishmentId)
+        .orElseThrow(()-> new StablishmentIdNotFoundException(stablishmentId));
+
+        Set<Stablishment> favorites = user.getFavoritesStablishments();
+
+        favorites.remove(stablishment);
+
+        user.setFavoritesStablishments(favorites);
+
+        User updatedUser = userRepository.save(user);
+
+        return UserMapper.toDTO(updatedUser);
+
     }
 
     public List<UserDTO> findAllOwners(){

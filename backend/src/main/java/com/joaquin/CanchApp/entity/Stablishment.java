@@ -67,5 +67,8 @@ public class Stablishment {
         )
     @Builder.Default
     private Set<Amenity> amenities = new HashSet<>();
+
+    @ManyToMany(mappedBy = "favoritesStablishments")
+    private Set<User> usersFavorites;
     
 }

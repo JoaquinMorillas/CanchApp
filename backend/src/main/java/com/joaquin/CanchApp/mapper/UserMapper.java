@@ -1,6 +1,7 @@
 package com.joaquin.CanchApp.mapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import com.joaquin.CanchApp.dto.UserDTO;
@@ -27,6 +28,13 @@ public class UserMapper {
             .map(StablishmentMapper::toDTO)
             .collect(Collectors.toList())
             :new ArrayList<>()
+        )
+        .favoritesStablishments(
+            user.getFavoritesStablishments().size() > 0
+            ? user.getFavoritesStablishments().stream()
+            .map(StablishmentMapper::toDTO)
+            .collect(Collectors.toSet())
+            :new HashSet<>()
         )
         .build();
     }

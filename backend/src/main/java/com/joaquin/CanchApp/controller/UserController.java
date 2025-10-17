@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.joaquin.CanchApp.dto.UserDTO;
 import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.EmailAlreadyExistsExcepction;
+import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.UserEmailNotFoundException;
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
 import com.joaquin.CanchApp.service.UserService;
@@ -80,5 +82,25 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> findAllOwners(){
         List<UserDTO> owners = userService.findAllOwners();
         return ResponseEntity.ok(owners);
+    }
+
+    @PostMapping("/{userId}/favorites/{stablishmentId}")
+    public ResponseEntity<UserDTO> addFavorite(
+        @PathVariable Integer userId, 
+        @PathVariable Integer stablishmentId
+    ) throws StablishmentIdNotFoundException, UserIdNotFoundException{
+        
+        UserDTO user = userService.addFavorite(userId, stablishmentId);
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/{userId}/favorites/delete/{stablishmentId}")
+    public ResponseEntity<UserDTO> deleteFavorite(
+        @PathVariable Integer userId,
+        @PathVariable Integer stablishmentId
+    ) throws UserIdNotFoundException, StablishmentIdNotFoundException{
+        
+        UserDTO user = userService.deleteFavorite(userId, stablishmentId);
+        return ResponseEntity.ok(user);
     }
 }
