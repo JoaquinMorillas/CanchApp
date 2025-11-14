@@ -170,6 +170,23 @@ If the refresh token is invalid or expired, the API returns `403 Forbidden`.
 Endpoints related to **reservations**, **user profile**, and **admin actions** require a valid JWT.  
 Requests with missing or invalid tokens will return `401 Unauthorized`.
 
+The database comes with a few preset users with different ROLES: "ADMIN"(For the app administrator), "Owners"(with access administration priviliges for their products only) and "USER"(For the common user with no adminitration priviliges. In the frontEnd this users are reffered as "JUGADORES").
+
+the user's list is the following:
+```bash
+'joaquin@morillas.com'
+'maria@alvarez.com'
+'juan@perez.com'
+'juana@rodriguez.com'
+'joamorillas@gmail.com'
+'juan@gomez.com'
+'ana@garcia.com'
+'joaquimmorillasarce@gmail.com'
+
+```
+
+for all the users the password is "hola"
+
 ## 👨‍💻 Author **Joaquín Morillas** 
 [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JoaquinMorillas) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joaquin-morillas-7b97b1254/)
 
@@ -336,5 +353,21 @@ Si el refresh token es inválido o expiró, la API responde con 403 Forbidden.
 
 Las rutas relacionadas con reservas, perfil de usuario y panel de administración requieren un JWT válido.
 Si el token falta o es inválido, la API devuelve 401 Unauthorized.
+
+La base de datos viene con algunos usuarios precargados con diferentes ROLES: "ADMIN"(Para el administrador de la página), "OWNER"(Con accesso a privilegios de administrador solo para sus productos) y "USER"(Para los usuarios comunes sin prilegios de administracion. En el frontEnd son referidos como "JUGADORES").
+
+El listado de usuarios es el siguiente:
+```bash
+'joaquin@morillas.com'
+'maria@alvarez.com'
+'juan@perez.com'
+'juana@rodriguez.com'
+'joamorillas@gmail.com'
+'juan@gomez.com'
+'ana@garcia.com'
+'joaquimmorillasarce@gmail.com'
+
+```
+Para todos los usuarios la contraseña es "hola"
 ## 👨‍💻 Autor **Joaquín Morillas** 
 [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JoaquinMorillas) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joaquin-morillas-7b97b1254/)
