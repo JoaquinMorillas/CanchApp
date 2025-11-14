@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { SportCardComponent } from './SportCardComponent'
 import { sportsInfo } from '../data/sportsInfo'
+import { useApi } from '../context/AxiosInstance'
 
 export const CategoriesComponent = () => {
-
+  const api = useApi()
+  const [sports, setSports] = useState([])
   const[shuffledSports, setShuffeledSports] = useState([])
   const scrollRef = useRef(null)
 
@@ -22,8 +24,16 @@ export const CategoriesComponent = () => {
   };
   
   useEffect(() => {
-    setShuffeledSports(shuffleSports(sportsInfo))
-  }, [sportsInfo])
+    const getSports = async() => {
+      const response = await api.get("/sport")
+      const gettedSports = response.data
+      setSports(gettedSports)
+      setShuffeledSports(shuffleSports(gettedSports))
+    }
+    if(sports.length == 0){
+      getSports()
+    }
+  }, [])
 
 
   return (
@@ -37,7 +47,7 @@ export const CategoriesComponent = () => {
       </button>
 
       <h3 className='text-center'>Buscar por categoria</h3>
-
+        
 
         <div
           className="d-flex overflow-auto gap-3 px-5"
@@ -49,7 +59,7 @@ export const CategoriesComponent = () => {
             <SportCardComponent 
             width='250px'
             sport={sport}
-            link={`/establecimientos/buscar/${sport.id}`}/>
+            link={`/establecimientos/buscar/${sport.name}`}/>
             </div>
           ))}
         </div>

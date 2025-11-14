@@ -111,4 +111,19 @@ public class GlobalException {
     public ResponseEntity<String> handleAmenityNameNotFoundException(AmenityNameNotFoundException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(PolicyIdNotFoundException.class)
+    public ResponseEntity<String> handlePolicyIdNotFoundException(PolicyIdNotFoundException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(RatingMustHaveValueException.class)
+    public ResponseEntity<String> handleRatingMustHaveValueException(RatingMustHaveValueException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(SportNameNotFoundException.class)
+    public ResponseEntity<String> handleSportNameNotFoundException(SportNameNotFoundException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

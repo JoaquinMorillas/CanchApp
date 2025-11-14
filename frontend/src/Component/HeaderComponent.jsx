@@ -41,7 +41,7 @@ export const HeaderComponent = () => {
   style={{ backgroundColor: "var(--bs-primary)", color:"var(--bs-dark)"}}>
         <div className="container-fluid">
           <Link to={"/"}>
-            <img src="/icons8-deportes-color-96.png" alt="Logo" width="30" height="24" className="d-inline-block align-text-top" />
+            <img src="/canchApp_logo.-removebg-preview.png" alt="Logo" width="80" height="80" className="d-inline-block align-text-top" />
           </Link>
             
             

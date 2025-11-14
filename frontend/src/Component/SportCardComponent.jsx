@@ -5,16 +5,16 @@ export const SportCardComponent = ( { sport, showButton = true, width="100%", he
   return (
     <>
     <div className="card text-center d-flex flex-column justify-content-between h-100">
-        <img src={sport.imgLink}
+        <img src={sport.imgUrl}
          class="card-img-top mt-3" 
-         alt={sport.title} 
+         alt={sport.name} 
          style={{
           width: width, 
           height: height,
           objectFit: "contain"
         }}/>
         <div className="card-body d-flex flex-column justify-content-between">
-            <h5 className="card-title">{sport.title}</h5>
+            <h5 className="card-title">{sport.name}</h5>
             {showButton && (
               <Link to={link}>
                 <button className="btn btn-lg mt-2 align-self-center"

@@ -1,6 +1,7 @@
 package com.joaquin.CanchApp.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +71,10 @@ public class User implements UserDetails{
     @Builder.Default
     private Set<Stablishment> favoritesStablishments = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<Rating> ratings = new ArrayList<>();
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

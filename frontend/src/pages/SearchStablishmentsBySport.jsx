@@ -15,7 +15,7 @@ export const SearchStablishmentsBySport = () => {
 
     /* filter the stablishments to those that have a sportField for the given sport */
     useEffect(() => {
-        setFilteredStablishments(stablishments.all.filter((st) => st.sports.some((sp) => sp == sport)))
+        setFilteredStablishments(stablishments.all.filter((st) => st.sports.some((sp) => sp.name == sport)))
         
     },[stablishments, sport])
 

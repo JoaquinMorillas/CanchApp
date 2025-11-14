@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import com.joaquin.CanchApp.dto.UserDTO;
+import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.entity.User;
 
 public class UserMapper {
@@ -29,12 +30,19 @@ public class UserMapper {
             .collect(Collectors.toList())
             :new ArrayList<>()
         )
-        .favoritesStablishments(
+        .favoritesStablishmentsIds(
             user.getFavoritesStablishments().size() > 0
             ? user.getFavoritesStablishments().stream()
-            .map(StablishmentMapper::toDTO)
+            .map(Stablishment::getId)
             .collect(Collectors.toSet())
             :new HashSet<>()
+        )
+        .ratings(
+            user.getRatings().size() > 0
+            ? user.getRatings().stream()
+            .map(RatingMapper::toDto)
+            .collect(Collectors.toList())
+            : new ArrayList<>()
         )
         .build();
     }

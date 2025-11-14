@@ -39,9 +39,10 @@ export const AuthProvider = ({children}) =>{
                 email: decoded.sub,
                 roles: decoded.roles,
                 firstName: decoded.firstName,
-                lastName : decoded.lastName  
+                lastName : decoded.lastName,
+                favorites : decoded.favorites  
             })
-            
+            console.log(user)
             return true    
         }catch(error){
             if(error.response?.status === 401){
@@ -99,6 +100,10 @@ export const AuthProvider = ({children}) =>{
         navigate("/")
     }
 
+    const deleteFavorite = (id) => {
+        const updatedFavorites = user.favorites.filter((s) => s !== id)
+        setUser({...user, favorites:updatedFavorites})
+    }
     /* this will run on reload or setUp, if a refresh token is
      saved in HTTP cookie(for production) or LocalStorage(for development) 
      the refresh endpoint will send a new
@@ -126,7 +131,8 @@ export const AuthProvider = ({children}) =>{
                     email: decoded.sub,
                     roles: decoded.roles,
                     firstName: decoded.firstName,
-                    lastName : decoded.lastName                    
+                    lastName : decoded.lastName,
+                    favorites : decoded.favorites                    
                 })
             }catch{
                 setToken(null)
@@ -137,7 +143,7 @@ export const AuthProvider = ({children}) =>{
     },[])
 
     return(
-        <AuthContext.Provider value={{setToken, token, user, login, register, logOut}}>
+        <AuthContext.Provider value={{setToken, token, user, setUser, login, register, logOut, deleteFavorite}}>
             {children}
         </AuthContext.Provider>            
     )

@@ -35,7 +35,7 @@ export const InputComponent = ({label="", type, value, setValue, disabled=false}
                     />
           )
         }
-    
+        
       default:
         return (
           <input 

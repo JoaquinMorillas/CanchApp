@@ -75,7 +75,7 @@ export const SearcherComponent = () => {
     useEffect(() =>{
       setFilteredSports(
         sports.filter((s) =>
-        s.label.toLowerCase().startsWith(selectedSport.toLowerCase()))
+        s.name.toLowerCase().startsWith(selectedSport.toLowerCase()))
       )
     }, [selectedSport])
 
@@ -136,11 +136,11 @@ export const SearcherComponent = () => {
                 <li
                   key={idx}
                   className="list-group-item list-group-item-action"
-                  onClick={() => {setSelectedSport(sport.label);
+                  onClick={() => {setSelectedSport(sport.name);
                                 setSelectedSportValue(sport.name);
                               console.log(selectedSportValue)}}
                 >
-                  {sport.label}
+                  {sport.name}
                 </li>
               ))}
             </ul>

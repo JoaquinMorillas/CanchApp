@@ -3,10 +3,12 @@ import Swal from "sweetalert2";
 import { useApi } from '../../context/AxiosInstance';
 import { useContext, useState } from 'react';
 import { StablishmentContext } from '../../context/StablishmentContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Step4 = ({ formData, onBack }) => {
     const { addStablishment } = useContext(StablishmentContext) 
     const [error, setError] = useState(null);
+    const navigate = useNavigate()
 
     useEffect(() => {
       console.log(formData);
@@ -16,6 +18,9 @@ export const Step4 = ({ formData, onBack }) => {
     try {
       await addStablishment(formData);
       Swal.fire("Éxito", "Establecimiento agregado", "success");
+      setTimeout(() => {
+        navigate("/")
+      }, 1000)
     } catch (error) {
       setError(error.response.data);
       Swal.fire({

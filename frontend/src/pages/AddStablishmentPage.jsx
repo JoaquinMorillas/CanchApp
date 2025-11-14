@@ -14,6 +14,7 @@ export const AddStablishmentPage = () => {
   const [formData, setFormData] = useState({
     ownerId: "",
     name: "",
+    description:"",
     country: "",
     city: "",
     postalCode: "",
@@ -21,7 +22,8 @@ export const AddStablishmentPage = () => {
     number: "",
     province: "",
     images: [],
-    amenities: []
+    amenities: [],
+    policies: []
   });
 
 

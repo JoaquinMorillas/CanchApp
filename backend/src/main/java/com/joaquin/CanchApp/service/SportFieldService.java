@@ -16,10 +16,12 @@ import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 import com.joaquin.CanchApp.exception.SportFieldNameAlreadyExistsException;
+import com.joaquin.CanchApp.exception.SportNameNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.mapper.SportFieldMapper;
 import com.joaquin.CanchApp.mapper.SportFieldUpdateMapper;
 import com.joaquin.CanchApp.repository.SportFieldRepository;
+import com.joaquin.CanchApp.repository.SportRepository;
 import com.joaquin.CanchApp.repository.StablishmentRepository;
 
 @Service
@@ -29,8 +31,10 @@ public class SportFieldService {
     private SportFieldRepository sportFieldRepository;
     @Autowired
     private StablishmentRepository stablishmentRepository;
+    @Autowired
+    private SportRepository sportRepository;
 
-    public SportFieldDTO save(SportFieldDTO sportField) throws SportFieldNameAlreadyExistsException{
+    public SportFieldDTO save(SportFieldDTO sportField) throws SportFieldNameAlreadyExistsException, SportNameNotFoundException{
         
        
         Optional<SportField> searchedSportFieldName = sportFieldRepository.findByStablishmentIdAndName(sportField.getStablishmentId(), sportField.getName());
@@ -38,11 +42,13 @@ public class SportFieldService {
             throw new SportFieldNameAlreadyExistsException(searchedSportFieldName.get().getName());
         }else{
             Optional<Stablishment> stablishment = stablishmentRepository.findById(sportField.getStablishmentId());
+            Sport sport = sportRepository.findByName(sportField.getSportName())
+            .orElseThrow(()-> new SportNameNotFoundException(sportField.getSportName()));
             SportField savedSportField = SportField.builder()
                 .name(sportField.getName())
                 .price(sportField.getPrice())
                 .reservationDuration(sportField.getReservationDuration())
-                .sport(sportField.getSport())
+                .sport(sport)
                 .stablishment(stablishment.get())
                 .reservations(new ArrayList<>())
                 .availabilities(new ArrayList<>())  
@@ -78,8 +84,7 @@ public class SportFieldService {
     }
 
     public List<SportFieldDTO> findBySportAndCity(String sport, String city){
-        Sport sportEnum = Sport.valueOf(sport.toUpperCase());
-        List<SportField> sportFields = sportFieldRepository.findBySportAndStablishmentAddressCityContainingIgnoreCase(sportEnum, city);
+        List<SportField> sportFields = sportFieldRepository.findBySportNameAndStablishmentAddressCityContainingIgnoreCase(sport, city);
         List<SportFieldDTO> sportFieldCreationDTOs =
         sportFields.stream()
         .map(SportFieldMapper::toDTO)
@@ -89,8 +94,8 @@ public class SportFieldService {
     }
 
     public List<SportFieldDTO> findBySport(String sport) {
-        Sport sportEnum = Sport.valueOf(sport.toUpperCase()); 
-        List<SportField> sportFields = sportFieldRepository.findBySport(sportEnum);
+         
+        List<SportField> sportFields = sportFieldRepository.findBySportName(sport);
         List<SportFieldDTO> sportFieldCreationDTOs =
         sportFields.stream()
         .map(SportFieldMapper::toDTO)
@@ -156,13 +161,13 @@ public class SportFieldService {
         }
     }
 
-    public List<SportFieldDTO> findByStablishmentIdAndSport(Integer id, Sport sport) throws StablishmentIdNotFoundException{
+    public List<SportFieldDTO> findByStablishmentIdAndSportName(Integer id, String sport) throws StablishmentIdNotFoundException{
         Optional<Stablishment> searchedStablishment = stablishmentRepository.findById(id);
         if(!searchedStablishment.isPresent()){
             throw new StablishmentIdNotFoundException(id);
         }
 
-        List<SportField> sportFields = sportFieldRepository.findByStablishmentIdAndSport(id, sport);
+        List<SportField> sportFields = sportFieldRepository.findByStablishmentIdAndSportName(id, sport);
         List<SportFieldDTO> dtos = sportFields.stream()
         .map(SportFieldMapper::toDTO)
         .collect(Collectors.toList());

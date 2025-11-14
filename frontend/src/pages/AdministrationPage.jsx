@@ -101,14 +101,21 @@ export const AdministrationPage = () => {
           <NavLink to="/administracion/caracteristicas">
             <button className='btn btn-primary ms-5 btn-lg'>Administrar caracteristicas</button>
           </NavLink>
+          <NavLink to="/administracion/politicas">
+            <button className='btn btn-primary ms-5 btn-lg'>Administrar politicas</button>
+          </NavLink>
+          
+          <NavLink to="/administracion/agregar_establecimiento">
+            <button className='btn btn-primary ms-5 btn-lg'>Agregar Establecimiento</button>
+          </NavLink>
+
+          <NavLink to="/administracion/deportes">
+              <button className='btn btn-primary ms-5 btn-lg'>Administrar Deportes</button>
+            </NavLink>
+          
         </div>
         )}
 
-        <div className='container-fluid d-flex justify-content-center'>
-          <NavLink to="/administracion/agregar_establecimiento">
-            <button className='btn btn-primary mb-5 btn-lg'>Agregar Estableciminto</button>
-          </NavLink>
-        </div>
 
         <h3 className='text-center mb-5'> Establecimientos: </h3>
 
@@ -129,7 +136,7 @@ export const AdministrationPage = () => {
               </tr>
             </thead>
             <tbody>
-              {allStablishments.map((stablishment) => (
+              {allStablishments?.map((stablishment) => (
               <tr key={stablishment.id}>
                 <th scope='row' className='text-center'>{stablishment.id }</th>
                 <td className='text-center'>
@@ -142,7 +149,7 @@ export const AdministrationPage = () => {
                   {stablishment.sports.length > 0 ? (
                     stablishment.sports.map((sport, index) => (
                       <span key={index} className="badge bg-primary me-1">
-                        {sport}
+                        {sport.name}
                       </span>
                     ))
                   ) : (

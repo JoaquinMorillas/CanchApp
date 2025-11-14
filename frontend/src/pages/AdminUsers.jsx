@@ -72,7 +72,7 @@ export const AdminUsers = () => {
   return (
     <>
     <h2 className='text-center'>Listas de usuarios:</h2>
-    <h3 className='text-left'>Administradores:</h3>
+    <h3 className='text-left ps-3'>Administradores:</h3>
     {admins.length > 0 ? (
         <table className="table table-striped table-hover">
             <thead style={{ 
@@ -135,7 +135,7 @@ export const AdminUsers = () => {
         no hay administradores
       </div>
     )}
-    <h3 className='text-left'>Dueños:</h3>
+    <h3 className='text-left ps-3'>Dueños:</h3>
     {owners.length > 0 ? (
       <table className="table table-striped table-hover">
         <thead style={{ 
@@ -188,7 +188,7 @@ export const AdminUsers = () => {
         no hay dueños
       </div>
     )}
-    <h3 className='text-left'>Jugadores:</h3>
+    <h3 className='text-left ps-3'>Jugadores:</h3>
     <table className="table table-striped table-hover">
       <thead tyle={{ 
             backgroundColor: 'var(--bs-light)' }}>

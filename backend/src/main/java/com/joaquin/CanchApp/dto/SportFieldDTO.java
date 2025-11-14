@@ -15,7 +15,8 @@ public class SportFieldDTO {
     private Integer stablishmentId;
     private Double price;
     private Duration reservationDuration;
-    private Sport sport;
+    private String sportCategory;
+    private String sportName;
 
     
 }

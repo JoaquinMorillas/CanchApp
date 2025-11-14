@@ -29,4 +29,12 @@ public class StablishmentDTO {
 
     private Set<AmenityDTO> amenities;
 
+    private List<PolicyDTO> policies;
+
+    private List<RatingDTO> ratings;
+
+    private Double AverageRating;
+    private Integer numberOfRatings;
+    private Integer sumOfRatings;
+
 }

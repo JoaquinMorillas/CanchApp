@@ -25,6 +25,8 @@ import { AdminUsers } from './pages/AdminUsers'
 import { ProtectedRoute } from './Component/ProtectedRoute'
 import { Unauthorized } from './pages/Unauthorized'
 import { AmenitiesPage } from './pages/AmenitiesPage'
+import { PoliciesPage } from './pages/PoliciesPage'
+import { EditSportsPage } from './pages/EditSportsPage'
 
 export const CanchApp = () =>{
     
@@ -47,11 +49,14 @@ export const CanchApp = () =>{
                                 <Route path='/administracion/canchas/editar/:id/crear_disponibilidad/:day' element={<AddAvailability />} />
                                 <Route path='/administracion/canchas/editar/:id/crear_disponibilidades' element={<AddAvailabilities />} />
                                 <Route path='/administracion/canchas/editar/:id/crear_reservas' element={<AddReservations />} />
-                                <Route path='administracion/caracteristicas' element={<AmenitiesPage />}/>
+
                             </Route>
                             {/* Protected Routes for ADMIN*/}
                             <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN"]}/>}>
                                 <Route path='/administracion/usuarios' element={<AdminUsers />}/>
+                                <Route path='administracion/deportes' element={<EditSportsPage />}/>
+                                <Route path='administracion/politicas' element={<PoliciesPage />}/>
+                                <Route path='administracion/caracteristicas' element={<AmenitiesPage />}/>
                             </Route>
                             
                             {/* Protected Routes for anyone registered*/}

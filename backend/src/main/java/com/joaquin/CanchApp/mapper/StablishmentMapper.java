@@ -1,5 +1,6 @@
 package com.joaquin.CanchApp.mapper;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.joaquin.CanchApp.dto.StablishmentDTO;
@@ -25,6 +26,20 @@ public class StablishmentMapper {
         .amenities(stablishment.getAmenities().stream()
                     .map(AmenityMapper::toDTO)
                     .collect(Collectors.toSet()))
+        .policies(stablishment.getPolicies().stream()
+                                .map(PolicyMapper::toDTO)
+                                .collect(Collectors.toList())
+        )
+        .ratings(
+            stablishment.getRatings().size() > 0
+            ? stablishment.getRatings().stream()
+            .map(RatingMapper::toDto)
+            .collect(Collectors.toList())
+            : new ArrayList<>()
+        )
+        .AverageRating(stablishment.getAverageRating())
+        .sumOfRatings(stablishment.getSumOfRatings())
+        .numberOfRatings(stablishment.getNumberOfRatings())                
         .build();
     }
 }

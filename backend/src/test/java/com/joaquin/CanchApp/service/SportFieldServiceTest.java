@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.joaquin.CanchApp.dto.SportFieldDTO;
 import com.joaquin.CanchApp.entity.Sport;
 import com.joaquin.CanchApp.exception.SportFieldNameAlreadyExistsException;
+import com.joaquin.CanchApp.exception.SportNameNotFoundException;
 
 import jakarta.transaction.Transactional;
 
@@ -40,14 +41,15 @@ public class SportFieldServiceTest {
     private Integer sportFieldId;
 
     @BeforeEach
-    public void dataLoad() throws SportFieldNameAlreadyExistsException{
+    public void dataLoad() throws SportFieldNameAlreadyExistsException, SportNameNotFoundException{
         SportFieldDTO sportFieldTosave = SportFieldDTO.builder() 
                 
             .name("cancha 50")
             .stablishmentId(1)
             .price(300.0)
             .reservationDuration(Duration.ofMinutes(60))
-            .sport(Sport.FUTBOL_11)
+            .sportName("Futbol 11")
+            .sportCategory("Futbol")
             .build();
             ;
         SportFieldDTO savedDTO = sportFieldService.save(sportFieldTosave);
@@ -85,7 +87,7 @@ public class SportFieldServiceTest {
                         .andExpect(jsonPath("$.name").value("cancha 50"))
                         .andExpect(jsonPath("$.stablishmentId").value("1"))
                         .andExpect(jsonPath("$.price").value("300.0"))
-                        .andExpect(jsonPath("$.sport").value("FUTBOL_11"));
+                        .andExpect(jsonPath("$.sportName").value("Futbol 11"));
     }
 
     @Test
@@ -112,7 +114,7 @@ public class SportFieldServiceTest {
                 "stablishmentId": 1,
                 "price": 300.0,
                 "reservationDuration": "PT1H30M",
-                "sport": "FUTBOL_11"
+                "sportName": "Futbol 11"
                 }
                 """;
         

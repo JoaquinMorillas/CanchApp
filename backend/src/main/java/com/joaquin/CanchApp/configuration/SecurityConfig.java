@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/reservation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/sport/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/availability/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/policy/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/rating/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/auth/refresh").permitAll()
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         //methods can only authenticaded can perform

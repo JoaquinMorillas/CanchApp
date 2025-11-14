@@ -15,10 +15,13 @@ public class StablishmentCreationDTO {
     private Integer id;
     private Integer ownerId;
     private String name;
+    private String description;
     @JsonProperty("images")
     private List<ImageInfo> images;
     @JsonProperty("amenities")
     private Set<AmenityDTO> amenities;
+    @JsonProperty("policies")
+    private List<PolicyDTO> policies;
 
     //Address attributes
     private String country;

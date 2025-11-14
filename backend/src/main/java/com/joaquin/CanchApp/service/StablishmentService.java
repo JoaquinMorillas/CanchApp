@@ -14,15 +14,18 @@ import com.joaquin.CanchApp.dto.StablishmentCreationDTO;
 import com.joaquin.CanchApp.dto.StablishmentDTO;
 import com.joaquin.CanchApp.entity.Address;
 import com.joaquin.CanchApp.entity.Amenity;
+import com.joaquin.CanchApp.entity.Policy;
 import com.joaquin.CanchApp.entity.Sport;
 import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.AddressAlreadyExistsException;
+import com.joaquin.CanchApp.exception.PolicyIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentNameAlreadyExistsException;
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
 import com.joaquin.CanchApp.mapper.StablishmentMapper;
 import com.joaquin.CanchApp.repository.AmenityRespository;
+import com.joaquin.CanchApp.repository.PolicyRepository;
 import com.joaquin.CanchApp.repository.StablishmentRepository;
 import com.joaquin.CanchApp.repository.UserRepository;
 import com.joaquin.CanchApp.mapper.StablishmentCreationMapper;
@@ -38,6 +41,8 @@ public class StablishmentService {
     private AddressService addressService;
     @Autowired
     private AmenityRespository amenityRespository;
+    @Autowired
+    private PolicyRepository policyRepository;
 
     public List<StablishmentDTO> findAll(){
         List<Stablishment> stablishments = stablishmentRepository.findAll();
@@ -77,14 +82,21 @@ public class StablishmentService {
                                         .map(a -> amenityRespository.findByName(a.getName())
                                         .orElseThrow(() -> new RuntimeException("Amenity not found: " + a.getName())))
                                         .collect(Collectors.toSet());
-    
+            
+            Set<Policy> policies = stablishmentCreationDTO.getPolicies().stream()
+                                    .map(p -> policyRepository.findById(p.getId())
+                                    .orElseThrow(() -> new RuntimeException("Policy not found")))
+                                    .collect(Collectors.toSet());
+                                    
             Stablishment stablishment = Stablishment.builder()
                 .owner(owner.get())
                 .address(address)
                 .name(stablishmentCreationDTO.getName())
+                .description((stablishmentCreationDTO.getDescription()))
                 .images(stablishmentCreationDTO.getImages())
                 .sportFields(new ArrayList<>())
                 .amenities(amenities)
+                .policies(policies)
                 .build();
 
             Stablishment savedStablishment = stablishmentRepository.save(stablishment);
@@ -175,6 +187,13 @@ public class StablishmentService {
                                         .orElseThrow(() -> new RuntimeException("Amenity not found")))
                                         .collect(Collectors.toSet());
             stablishmentToSave.setAmenities(amenities);
+            }
+            if(stablishmentDTO.getPolicies() != null){
+                Set<Policy> policies = stablishmentDTO.getPolicies().stream()
+                                        .map(p -> policyRepository.findById(p.getId())
+                                        .orElseThrow(() -> new RuntimeException("Policy not found")))
+                                        .collect(Collectors.toSet());
+                stablishmentToSave.setPolicies(policies);
             }
             stablishmentRepository.save(stablishmentToSave);
             return StablishmentMapper.toDTO(stablishmentToSave);

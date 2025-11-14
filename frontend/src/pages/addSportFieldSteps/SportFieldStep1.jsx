@@ -183,13 +183,13 @@ export const SportFieldStep1 = ({stablishment, formData, setFormData, onNext, se
             type="text" 
             class="form-control"
             value={formData.sport}
-            onChange={(e) => setFormData({ ...formData, sport: e.target.value })} 
+            onChange={(e) => setFormData({ ...formData, sportName: e.target.value })} 
             placeholder='futbol 7'
             style={{ maxWidth: "250px" }}
             >
             <option key={"default"} value={""}>Seleccione un deporte</option>
             {sports.map((s) => (
-              <option key={s.name} value={s.name}>{s.label}</option>
+              <option key={s.name} value={s.name}>{s.name}</option>
             ))}
             </select>  
         </div>

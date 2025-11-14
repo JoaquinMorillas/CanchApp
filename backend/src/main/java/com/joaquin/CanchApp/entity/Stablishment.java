@@ -1,5 +1,6 @@
 package com.joaquin.CanchApp.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,5 +71,23 @@ public class Stablishment {
 
     @ManyToMany(mappedBy = "favoritesStablishments")
     private Set<User> usersFavorites;
+
+    @ManyToMany
+    @JoinTable(
+        name = "stablishment_policies",
+        joinColumns = @JoinColumn(name = "stablishment_id"),
+        inverseJoinColumns = @JoinColumn(name = "policy_id")
+    )
+    @Builder.Default
+    private Set<Policy> policies = new HashSet<>();
+
+    @OneToMany(mappedBy = "stablishment")
+    @Builder.Default
+    private List<Rating> ratings = new ArrayList<>();
+
+    private Double AverageRating;
+    private Integer numberOfRatings;
+    private Integer sumOfRatings;
+
     
 }

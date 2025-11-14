@@ -129,7 +129,7 @@ export const StablishmentProvider = ({ children }) => {
     useEffect(() =>{
         
         fetchStablishments();
-        console.log("stablishments from context: ", stablishments)
+        
         
 
     }, [])

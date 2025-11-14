@@ -12,7 +12,8 @@ public class SportFieldMapper {
         .stablishmentId(sportField.getStablishment().getId())
         .price(sportField.getPrice())
         .reservationDuration(sportField.getReservationDuration())
-        .sport(sportField.getSport())
+        .sportName(sportField.getSport().getName())
+        .sportCategory(sportField.getSport().getCategory())
         .build();
     }
 }

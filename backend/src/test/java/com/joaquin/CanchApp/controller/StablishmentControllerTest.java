@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +56,7 @@ public class StablishmentControllerTest {
                     .street("Calle falsa")
                     .number("123")
                     .amenities(new HashSet<>())
+                    .policies(new ArrayList<>())
                     .build();
 
         StablishmentCreationDTO savedStablishment = stablishmentService.save(stablishmentToSave);

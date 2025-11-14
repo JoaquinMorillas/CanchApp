@@ -22,6 +22,7 @@ import com.joaquin.CanchApp.entity.Sport;
 import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 import com.joaquin.CanchApp.exception.SportFieldNameAlreadyExistsException;
+import com.joaquin.CanchApp.exception.SportNameNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.service.SportFieldService;
 
@@ -35,7 +36,7 @@ public class SportFieldController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PostMapping("/save")
-    public ResponseEntity<SportFieldDTO> save(@RequestBody SportFieldDTO sportFieldCreationDTO) throws SportFieldNameAlreadyExistsException{
+    public ResponseEntity<SportFieldDTO> save(@RequestBody SportFieldDTO sportFieldCreationDTO) throws SportFieldNameAlreadyExistsException, SportNameNotFoundException{
         SportFieldDTO savedSportFieldCreationDTO = sportFieldService.save(sportFieldCreationDTO);
         return ResponseEntity.ok(savedSportFieldCreationDTO);
     }
@@ -105,8 +106,8 @@ public class SportFieldController {
     }
 
     @GetMapping("/stablishment/{id}/{sport}")
-    public ResponseEntity<List<SportFieldDTO>> findByStablishmentIdAndSport(@PathVariable Integer id, @PathVariable Sport sport) throws StablishmentIdNotFoundException{
-        List<SportFieldDTO> dtos = sportFieldService.findByStablishmentIdAndSport(id, sport);
+    public ResponseEntity<List<SportFieldDTO>> findByStablishmentIdAndSport(@PathVariable Integer id, @PathVariable String sport) throws StablishmentIdNotFoundException{
+        List<SportFieldDTO> dtos = sportFieldService.findByStablishmentIdAndSportName(id, sport);
         return ResponseEntity.ok(dtos);
         
     }

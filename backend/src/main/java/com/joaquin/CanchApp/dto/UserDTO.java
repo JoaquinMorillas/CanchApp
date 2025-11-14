@@ -3,6 +3,7 @@ package com.joaquin.CanchApp.dto;
 import java.util.List;
 import java.util.Set;
 
+
 import com.joaquin.CanchApp.entity.Role;
 
 import lombok.Builder;
@@ -19,5 +20,6 @@ public class UserDTO {
     private Role role;
     private List<ReservationDTO> reservations;
     private List<StablishmentDTO> stablishments;
-    private Set<StablishmentDTO> favoritesStablishments;
+    private Set<Integer> favoritesStablishmentsIds;
+    private List<RatingDTO> ratings;
 }

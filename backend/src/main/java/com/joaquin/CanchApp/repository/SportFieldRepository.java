@@ -19,11 +19,11 @@ public interface SportFieldRepository extends JpaRepository<SportField, Integer>
 
     List<SportField> findByStablishmentAddressCityContainingIgnoreCase(String city);
 
-    List<SportField> findBySportAndStablishmentAddressCityContainingIgnoreCase(Sport sport, String city);
+    List<SportField> findBySportNameAndStablishmentAddressCityContainingIgnoreCase(String sport, String city);
 
-    List<SportField> findBySport(Sport sport);
+    List<SportField> findBySportName(String name);
 
     List<SportField> findByStablishmentId(Integer id);
 
-    List<SportField> findByStablishmentIdAndSport(Integer id, Sport sport);
+    List<SportField> findByStablishmentIdAndSportName(Integer id, String sport);
 }

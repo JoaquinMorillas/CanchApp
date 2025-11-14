@@ -1,16 +1,21 @@
 import { useApi } from '../context/AxiosInstance'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { MapComponent } from '../Component/MapComponent'
 import { SportCardComponent } from '../Component/SportCardComponent'
 import { sportsInfo } from '../data/sportsInfo'
+import { OpinionComponent } from '../Component/OpinionComponent'
+import Swal from 'sweetalert2'
+import withReactContent from "sweetalert2-react-content";
 
 import { LeftArrowComponent } from '../Component/LeftArrowComponent'
+import { AuthContext } from '../context/AuthContext'
 
 export const StablishmentInfo = () => {
     /* used States */
     const api = useApi()
     const { id } = useParams()
+    const { user } = useContext(AuthContext)
 
     const [stablishment, setStablishment] = useState(null)
     const [showModal, setShowModal] = useState(false)
@@ -23,12 +28,125 @@ export const StablishmentInfo = () => {
     const [number, setNumber] = useState("")
     const [sports, setSports] = useState([])
     const [amenities, setAmenities] = useState([])
+    const [policies, setPolicies] = useState([])
+    const [ratings, setRatings] = useState([])
     const [sportFieldsNames, setSportFieldsNames] = useState([])
     const [lon, setLon] = useState("")
     const [lat, setLat] = useState("")
+    const MySwal = withReactContent(Swal);
 
     const baseURL = "http://localhost:8080"
 
+    const handleRate = async () => {
+        if(!user){
+            Swal.fire({
+                title:"Registrate en Canchapp",
+                text:`Para poder puntuar debes registrarte.
+                 Puedes hacerlo usando los botones situados
+                 en la parte superior derecha.`,
+                 icon:"warning",
+                 showCloseButton:true
+
+
+            })
+            return
+        }
+        const response = await MySwal.fire({
+            title: "¡Puntua este local!",
+            html: 
+            <>  
+            <div>
+                <label htmlFor="swal-rating">Puntuacion:</label>
+                <input id="swal-rating" type="number" min="1" max="5" placeholder="5" class="swal2-input" />
+            </div>
+            <div>
+                <textarea id="swal-comment" class="swal2-textarea" placeholder="Contanos tu opinion!"></textarea>
+            </div>
+            </>,
+            focusConfirm: false,
+            showCancelButton: true,
+            cancelButtonText:"Cancelar",
+            confirmButtonText: "Confirmar",
+            preConfirm: () => {
+                const rating = document.getElementById("swal-rating").value
+                const opinion = document.getElementById("swal-comment").value
+                return {rating, opinion}
+            }
+
+        })
+        if(response.isConfirmed){
+            const {rating, opinion} = response.value
+            if(rating == null || rating==""){
+                Swal.fire({
+                    title: "Error",
+                    text: "Es necesario poner una puntacion",
+                    icon: "error"
+                })
+            return
+            }
+            
+            try{
+                const apiResponse = await api.post(`rating/rate/${id}`, {"value":rating, "opinion":opinion})
+                const data = apiResponse.data
+                Swal.fire({
+                    title:"Muchas Gracias por tu puntuacion",
+                    text:`Has puesto un puntaje de ${data.value} al establecimiento`,
+                    icon:"success",
+                    showCloseButton:true,
+                    cancelButtonText:"Continuar"
+                })
+                const prevStablishment = stablishment
+                const newNumberOfRatings = prevStablishment.numberOfRatings + 1
+                const newSumOfRatings = prevStablishment.sumOfRatings + data.value
+                const newAverageRating = newSumOfRatings/newNumberOfRatings
+                setStablishment({...prevStablishment,
+                    ratings:[...ratings, data],
+                    numberOfRatings:newNumberOfRatings,
+                    sumOfRatings: newSumOfRatings,
+                    averageRating: newAverageRating
+                })
+                setRatings([...ratings, data])
+            }catch(error){
+                Swal.fire({
+                    title: "Error",
+                    text: error.response?.data?.message || error.response?.data || error.message,
+                    icon: "error"
+                });
+            }
+            
+        }
+    }
+
+    const RatingDisplay = (rating) => {
+  
+    const getImage = (index) => {
+        if (rating >= index + 1) return "/full-ball1.png";
+        if (rating >= index + 0.5) return "/half-ball1.png";
+        return "/empty-ball1.png";
+    };
+    return (
+    <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <img
+          key={i}
+          src={getImage(i)}
+          alt="rating ball"
+          style={{ width: "25px", height: "25px" }}
+        />
+      ))}
+     <span
+        className="badge"
+        style={{
+            marginLeft: "6px",
+            fontSize: "1.5rem",
+            backgroundColor: "var(--bs-secondary)"
+        }}
+        >
+        {rating.toFixed(1)}
+      </span>
+    </div>
+  );
+};
      
     /* fetch the stablishment and set the states */
     useEffect(() => {
@@ -45,6 +163,8 @@ export const StablishmentInfo = () => {
             setSports(gettedStablishment.sports)
             setSportFieldsNames(gettedStablishment.sportFieldsNames)
             setAmenities(gettedStablishment.amenities)
+            setPolicies(gettedStablishment.policies)
+            setRatings(gettedStablishment.ratings)
             
         }
         
@@ -80,13 +200,23 @@ export const StablishmentInfo = () => {
             geocodeAddress(street, number, city)
         }
     },[stablishment, street, number, city])
-  return (
+  return ( 
     <>  
     <div style={{maxWidth:"95%", margin:"0 auto", backgroundColor:"var(--bs-light)"}}>
 
         <LeftArrowComponent />
-        <h3 className='text-left mb-5'>{name}</h3>
-        <h5 className='text-left mb-3'>{description}</h5>
+        <h3 className='text-left mb-2 pt-3 ps-2'>{name}</h3>
+        <div className='d-flex align-items-center mb-5'>{stablishment?.averageRating 
+            && <><h5 className='me-3 ps-2'>Puntuacion:</h5>
+            
+            {RatingDisplay(stablishment.averageRating)}
+            </>}
+            <button className='btn btn-lg btn-primary ms-5'
+            onClick={() => handleRate()}>
+                Puntuar Establecimiento
+            </button>
+        </div>
+        <h5 className='text-left mb-3 ps-2'>{description}</h5>
 
         <div className='container-fluid'
         style={{backgroundColor:"var(--bs-light)"}}>
@@ -103,16 +233,16 @@ export const StablishmentInfo = () => {
                     </MapComponent>
                     ) : (<div>Mapa no Disponible</div> )}
                 </div >
-                    <div className="col-12 col-md-6 mb-2 mt-2"
+                    <div className="col-12 col-md-6 mt-2"
                     style={{border:"1px solid var(--bs-border-color)"}}>
                     <h5 className="text-center mb-2 p-3">Deportes:</h5>
-                    <div className="row g-2 justify-content-center">
+                    <div className="row g-2 justify-content-center mb-2">
                         {sports && sports.length > 0 ? (
-                        sports.map((s, index) => {
-                            const sport = sportsInfo.find((sp) => sp.id === s);
+                        sports.map((sport, index) => {
+                            
                             return (
                             <div key={index} className="col-6 col-sm-4 col-md-6 col-lg-4 ">
-                                <SportCardComponent sport={sport} buttonText='Reservar Ahora' link={`/establecimientos/${id}/${sport.id}/reservar`}></SportCardComponent>
+                                <SportCardComponent sport={sport} buttonText='Reservar Ahora' link={`/establecimientos/${id}/${sport.name}/reservar`}></SportCardComponent>
                             </div>
                             );
                         })
@@ -145,7 +275,55 @@ export const StablishmentInfo = () => {
                 </div>
             </div>
         )}
-        
+        {policies.length > 0 ? (
+             <div className="container-fluid mt-5 mb-5"
+            style={{backgroundColor:"var(--bs-light)", border:"1px solid var(--bs-border-color)"
+            }}>
+                <h5 className='text-center pt-3'>Politicas:</h5>
+                <div className='container'>
+                    <div className='row d-flex align-items-center justify-content-center'
+                    style={{border:"1px solid var(--bs-border-color)"}}>
+                    {policies.map((policy, idx) =>(
+                        <div className='col-3 m-2' key={idx}
+                        style={{border:"1px solid black", width:"300px", height:"150px"}}>
+                            <div className='row text-center'>
+                                <strong>{policy.title}</strong>
+                            </div>
+                            <div className='row text-center p-2'>
+                                {policy.description}
+                            </div>
+                        </div>
+                    ))}
+
+                    </div>
+                </div>
+            </div>    
+        ):(
+            <div className="mt-5 mb-5"
+            style={{backgroundColor:"var(--bs-light)", border:"1px solid var(--bs-border-color)"}}>
+                 <h3 className='text-center'>Sin Politicas</h3>
+            </div>
+        )}
+
+        {ratings.length > 0 ? (
+            <>
+                <div className="container-fluid mt-5 mb-5"
+            style={{backgroundColor:"var(--bs-light)", border:"1px solid var(--bs-border-color)"
+            }}>
+                <h5 className='text-center pt-3'>Puntuaciones:</h5>
+                {ratings.map((rating, idx) => (
+                    <div key={idx}>
+                        <OpinionComponent rating={rating}/>
+                    </div>
+                ))}
+            </div>
+            </>
+        ):(
+            <div className="mt-5 mb-5"
+            style={{backgroundColor:"var(--bs-light)", border:"1px solid var(--bs-border-color)"}}>
+                <h4 className='text-center'>Este establecimiento todavia no tiene Puntuaciones</h4>
+            </div>
+        )}
         {images && images.length > 0 ? (
         
         <div className="container-fluid mt-5 mb-5"

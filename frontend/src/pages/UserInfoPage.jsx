@@ -3,13 +3,20 @@ import { AuthContext } from '../context/AuthContext'
 import Avatar from '@mui/material/Avatar'
 import { InputComponent } from '../Component/InputComponent'
 import { useApi } from '../context/AxiosInstance'
+import { StablishmentContext } from '../context/StablishmentContext'
+import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 export const UserInfoPage = () => {
     const api = useApi()
-    const {user, logOut} = useContext(AuthContext)
+    const navigate = useNavigate()
+    const {stablishments} = useContext(StablishmentContext)
+    const allStablishments = stablishments.all
+    const {user, deleteFavorite} = useContext(AuthContext)
     const [reservations, setReservations] = useState([])
-    const [stablishments, setStablishments] = useState([])
-    
+    const [ownedStablishments, setOwnedStablishments] = useState([])
+    const [favorites, setFavorites] = useState([])
+     
     const formatDate = (dateString) => {
       const [year, month, day] = dateString.split("-").map(Number);
       const date = new Date(year, month -1, day)
@@ -29,6 +36,25 @@ export const UserInfoPage = () => {
       return firstChar+secondChar
   }
 
+  const handleTableClick = (id) => {
+    navigate(`/establecimientos/${id}`)
+  }
+
+  const handleDeleteFavorite = async(id) => {
+    const confirm = await Swal.fire({
+      title:"Atencion",
+      text:"¿Estas seguro que quieres quitar el establecimento de tus favoritos?",
+      icon:"question",
+      showConfirmButton:true,
+      showCancelButton:true
+    })
+    if(confirm.isConfirmed){
+      await api.post(`/user/${user.id}/favorites/delete/${id}`)
+      deleteFavorite(id)
+
+      setFavorites((allStablishments.filter(stablishment => user.favorites.includes(stablishment.id))))
+    }
+  }
   
   useEffect(() => {
     const getReservations = async () => {
@@ -48,7 +74,7 @@ export const UserInfoPage = () => {
       try{
         const response = await api.get(`/stablishment/user/${user.id}`)
         const gettedStablishments = response.data
-        setStablishments(gettedStablishments)
+        setOwnedStablishments(gettedStablishments)
       }catch(error){
         Swal.fire({
           title:"Error al buscar los establecimientos",
@@ -57,9 +83,15 @@ export const UserInfoPage = () => {
         })
     }
   }
+    
     getReservations()
     getStablishments()
   }, [])
+
+  useEffect(() => {
+    const favoritesIds = user.favorites || []
+    setFavorites((allStablishments.filter(stablishment => favoritesIds.includes(stablishment.id))))
+  },[user?.favorites, allStablishments])
 
   return (
     <>
@@ -170,7 +202,67 @@ export const UserInfoPage = () => {
         ):(
             <h3>Todavia No tienes ninguna Reserva...Explora la pagina de incio para comenzar a jugar!</h3>
           )}
-        {stablishments.length > 0 &&(
+
+
+        {favorites.length > 0 ? (
+          <div className='d-flex flex-column align-items-center'>
+            <h4 className='mt-3 mb-3 text-center'>Mis Establecimientos Favoritos:</h4>
+            <table className='table table-striped table-hover'>
+              <thead>
+                <tr>
+                  
+                  <th scope="col" className='text-center'>Nombre</th>
+                  <th scope="col" className='text-center'>Dirección</th>
+                  <th scope='col' className='text-center'>Deportes</th>
+                  
+                  <th scope='col' className='text-center'>Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {favorites.map((stablishment) => (
+                 
+                  <tr key={stablishment.id} 
+                  onClick={() => handleTableClick(stablishment.id)}
+                  style={{cursor:"pointer"}}>
+                    
+                   
+                    
+                    <td className='text-center'>
+                      {stablishment.name}
+                    </td>
+                    <td className='text-center'>
+                      {stablishment.street.toUpperCase()} {stablishment.number} {stablishment.city.toUpperCase()}
+                    </td>
+                    <td className='text-center'>
+                      {stablishment.sports.length > 0 ? (
+                        stablishment.sports.map((sport, index) => (
+                          <span key={index} className="badge bg-primary me-1">
+                            {sport.name}
+                          </span>
+                        ))
+                      ) : (
+                        "--"
+                      )}
+                    </td>
+                    
+                    <td>
+                      <button className='btn btn-danger btn-sm'
+                      style={{height:"50%", width:"75%", margin:"0 auto"}}
+                      onClick={e => {e.stopPropagation(); handleDeleteFavorite(stablishment.id)}}>
+                        Eliminar de Favoritos
+                        </button>
+                    </td>
+                  </tr>
+              
+                ))}
+              </tbody>
+
+              </table>
+          </div>       
+        ):(
+        <h3>Todavia No tienes ningun Favorito...Explora la pagina de incio para comenzar a jugar!</h3>
+        )}
+        {ownedStablishments.length > 0 &&(
           <div className='d-flex flex-column align-items-center'>
             <h4 className='mt-3 mb-3 text-center'>Mis Establecimientos:</h4>
             <table className='table table-striped table-hover'>
@@ -184,8 +276,10 @@ export const UserInfoPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {stablishments.map((stablishment) => (
-                  <tr key={stablishment.id}>
+                {ownedStablishments.map((stablishment) => (
+                  <tr key={stablishment.id}
+                  onClick={() => handleTableClick(stablishment.id)}
+                  style={{cursor:"pointer"}}>
                     <th className='text-center'>
                       {stablishment.id}
                     </th>
@@ -199,7 +293,7 @@ export const UserInfoPage = () => {
                       {stablishment.sports.length > 0 ? (
                         stablishment.sports.map((sport, index) => (
                           <span key={index} className="badge bg-primary me-1">
-                            {sport}
+                            {sport.name}
                           </span>
                         ))
                       ) : (

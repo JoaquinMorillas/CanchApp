@@ -10,6 +10,9 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
     const [amenities, setAmenities] = useState([])
     const [selectedAmenities , setSelectedAmenities] = useState([])
 
+    const [policies, setPolicies] = useState([])
+    const [selectedPolicies, setSelectedPolicies] = useState([])
+
     useEffect(() => {
       const getAmenities = async () => {
         try{
@@ -23,8 +26,23 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
               icon: "error"
             })
         }
+        
+      }
+      const getPolicies = async () => {
+        try{
+          const response = await api.get("/policy/all")
+          const gettedPolicies = response.data
+          setPolicies(gettedPolicies)
+        }catch(error){
+          Swal.fire({
+              title: "Error",
+              text: error.response?.data?.message || error.response?.data || error.message,
+              icon: "error"
+            })
+        }
       }
       getAmenities()
+      getPolicies()
     },[])
     /* main function it validates the fields and navigates to the next step*/
     const validateAndNext = async () => {
@@ -105,6 +123,25 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
             style={{ maxWidth: "250px" }}/>
           
         </div>
+        {/*Description input*/}
+        <div class="mb-3 d-flex align-items-center">
+          
+            <label  className="me-3 mb-0"
+            style={{  width: "250px", textAlign: "right" }}>
+              Descripcion del Establecimiento: 
+            </label>
+          
+            <textarea
+             
+            
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value })} 
+            placeholder='Ej: Hermoso establecimiento ideal para jugar un partido y luego charlar con amigos'
+            rows={4}
+            cols={50}
+            style={{ width: "250px",resize: "vertical"}}></textarea>
+          
+        </div>
 
         {/* amenities inputs*/}
         <h5 className='text-center'>Seleccione las caracteristicas</h5>
@@ -152,6 +189,49 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
           </tbody>
 
         </table>
+
+        {/* policies inputs*/}
+        <h5 className='text-center'>Seleccione las politicas</h5>
+        <table className='table table-striped table-hover'>
+          <thead>
+            <tr>
+              <th scope="col" className='text-center'>Titulo</th>
+              <th scope="col" className='text-center'>Descripción</th>
+              <th scope='col' className='text-center'>Seleccionar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {policies.map((policy,idx) => {
+              const isChecked = selectedPolicies.some((p) => p.id == policy.id)
+              
+              const handleCheck = (e) => {
+                if(e.target.checked){
+                  setSelectedPolicies([...selectedPolicies, policy])
+                  setFormData({...formData, policies:selectedPolicies})
+                }else{
+                  setSelectedPolicies(selectedPolicies.filter((p) => p.id!==policy.id))
+                  setFormData({...formData, policies:selectedPolicies})
+                }
+              }
+
+              return(
+                <tr key={idx}>
+                  <td className='text-center'>
+                    {policy.title}
+                  </td>
+                  <td className='text-center'>
+                    {policy.description}
+                  </td>
+                  <td>
+                    <input type="checkbox"
+                    checked={isChecked}
+                    onChange={handleCheck} />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+          </table>
         <div className="d-flex justify-content-center mt-4 gap-3">
           <NavLink to = "/administracion">
             <button className='btn btn-danger'>Atras</button>

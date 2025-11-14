@@ -35,8 +35,6 @@ public class SportField {
     private Double price;
     private Duration reservationDuration;
 
-    @Enumerated(EnumType.STRING)
-    private Sport sport;
 
     @ManyToOne
     @JoinColumn(name = "stablishment_id")
@@ -48,6 +46,9 @@ public class SportField {
     @OneToMany(mappedBy = "sportField", cascade = CascadeType.ALL)
     private List<Availability> availabilities;
 
+    @ManyToOne
+    @JoinColumn(name = "sport_id")
+    private Sport sport;
     
 
 }

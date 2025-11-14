@@ -23,7 +23,11 @@ public class StablishmentCreationMapper {
         .amenities(stablishment.getAmenities().stream()
                                 .map(AmenityMapper::toDTO)
                                 .collect(Collectors.toSet())
-                                )         
+                                ) 
+        .policies(stablishment.getPolicies().stream()
+                                .map(PolicyMapper::toDTO)
+                                .collect(Collectors.toList())
+        )                               
         .build();
     }
 

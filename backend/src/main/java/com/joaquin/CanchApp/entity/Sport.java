@@ -1,14 +1,30 @@
 package com.joaquin.CanchApp.entity;
 
-public enum Sport {
-    FUTBOL_11,
-    FUTBOL_7,
-    FUTBOL_5,
-    TENNIS_CESPED,
-    TENNIS_LADRILLO,
-    TENNIS_CEMENTO,
-    BASKETBALL,
-    PADEL_CEMENTO,
-    PADEL_VIDRIO
-}
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Sport {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String name;
+
+    private String category;
+
+    private String imgUrl;
+
+    
+}

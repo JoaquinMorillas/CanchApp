@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import com.joaquin.CanchApp.entity.Role;
+import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.EmailAlreadyExistsExcepction;
 import com.joaquin.CanchApp.exception.InvalidEmailException;
@@ -108,6 +111,11 @@ public class AuthService {
             claims.put(("firstName"), user.getFirstName());
 
             claims.put("lastName", user.getLastName());
+
+            claims.put("favorites", user.getFavoritesStablishments()
+                                    .stream()
+                                    .map(Stablishment::getId)
+                                    .collect(Collectors.toSet()));
 
             return claims;
         }
