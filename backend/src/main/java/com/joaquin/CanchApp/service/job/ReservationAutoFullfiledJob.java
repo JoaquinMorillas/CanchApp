@@ -43,6 +43,7 @@ public class ReservationAutoFullfiledJob {
         if(!reservationsToUpdate.isEmpty()){
             reservationRepository.saveAll(reservationsToUpdate);
         }
+        System.out.println("Reservations Fullfiled: " + reservationsToUpdate.size());
         
     }
 }

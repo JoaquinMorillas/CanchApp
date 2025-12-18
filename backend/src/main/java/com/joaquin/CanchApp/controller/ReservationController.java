@@ -21,6 +21,7 @@ import com.joaquin.CanchApp.dto.ReservationDTO;
 import com.joaquin.CanchApp.dto.SlotDTO;
 import com.joaquin.CanchApp.entity.Slot;
 import com.joaquin.CanchApp.entity.User;
+import com.joaquin.CanchApp.exception.ReservationDateIsBeforeCurrentDate;
 import com.joaquin.CanchApp.exception.ReservationIdNotFoundException;
 import com.joaquin.CanchApp.exception.ReservationIsAlreadyConfirmedException;
 import com.joaquin.CanchApp.exception.ReservationUserIdIsDiferentFromTheIdSuppliedException;
@@ -90,7 +91,7 @@ public class ReservationController {
     @PutMapping("/confirm/{reservationId}")
     public ResponseEntity<ReservationDTO> confirmReservation(
         @PathVariable Integer reservationId, 
-        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException{
+        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException, ReservationDateIsBeforeCurrentDate{
         ReservationDTO dto = reservationService.confirmReservarion(reservationId, user.getId());
         return ResponseEntity.ok(dto);
     }

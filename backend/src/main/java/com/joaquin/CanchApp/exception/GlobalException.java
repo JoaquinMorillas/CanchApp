@@ -141,4 +141,9 @@ public class GlobalException {
     public ResponseEntity<String> handleReservationUserIsNullException(ReservationUserIsNullException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(ReservationDateIsBeforeCurrentDate.class)
+    public ResponseEntity<String> handleReservationDateIsBeforeCurrentDate(ReservationDateIsBeforeCurrentDate ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

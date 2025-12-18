@@ -23,7 +23,7 @@ import com.joaquin.CanchApp.entity.ReservationStatus;
 import com.joaquin.CanchApp.entity.Slot;
 import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.entity.User;
-
+import com.joaquin.CanchApp.exception.ReservationDateIsBeforeCurrentDate;
 import com.joaquin.CanchApp.exception.ReservationIdNotFoundException;
 import com.joaquin.CanchApp.exception.ReservationIsAlreadyConfirmedException;
 import com.joaquin.CanchApp.exception.ReservationUserIdIsDiferentFromTheIdSuppliedException;
@@ -303,7 +303,7 @@ public class ReservationService {
 
         public ReservationDTO confirmReservarion(Integer slotId, 
             Integer userId) 
-            throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException{
+            throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException, ReservationDateIsBeforeCurrentDate{
 
             Slot searchedSlot = slotRepository.findById(slotId)
             .orElseThrow(() -> new ReservationIdNotFoundException(slotId));
@@ -314,6 +314,10 @@ public class ReservationService {
             if(!searchedSlot.isAvailable()){
                 throw new ReservationIsAlreadyConfirmedException();
             }
+            if(searchedSlot.getReservationDate().isBefore(LocalDate.now())){
+                throw new ReservationDateIsBeforeCurrentDate();
+            };
+
 
             
             searchedSlot.setAvailable(false);
