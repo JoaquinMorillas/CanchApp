@@ -21,8 +21,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("""
             SELECT r from Reservation r
             WHERE r.reservationStatus = :status
-            AND r.reservationDate <= :today
-            AND r.finishTime <= :now
+            AND (
+                r.reservationDate < :today
+                OR (r.reservationDate = :today AND r.finishTime <= :now) 
+            )
             
             """)
     List<Reservation> findReservationsToFullfiled(
