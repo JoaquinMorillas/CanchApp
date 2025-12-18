@@ -18,7 +18,9 @@ import { ReserveByStablishmentAndSportPage} from './pages/ReserveByStablishmentA
 import { SearchStablishmentsBySport } from './pages/SearchStablishmentsBySport'
 import { ReserveByCitySportAndDate } from './pages/ReserveByCitySportAndDate'
 import { AuthContext, AuthProvider } from './context/AuthContext'
+import { LoadingProvider } from './context/LoadingContext'
 import { LoginPage } from './pages/LoginPage'
+
 import { RegisterPage } from './pages/RegisterPage'
 import { UserInfoPage } from './pages/UserInfoPage'
 import { AdminUsers } from './pages/AdminUsers'
@@ -27,6 +29,7 @@ import { Unauthorized } from './pages/Unauthorized'
 import { AmenitiesPage } from './pages/AmenitiesPage'
 import { PoliciesPage } from './pages/PoliciesPage'
 import { EditSportsPage } from './pages/EditSportsPage'
+import { AdminReservations } from './pages/AdminReservations'
 
 export const CanchApp = () =>{
     
@@ -35,6 +38,10 @@ export const CanchApp = () =>{
         <AuthProvider>
         
             <StablishmentProvider>
+                <LoadingProvider>
+
+                
+
                 <HeaderComponent />
                         
                         <Routes>
@@ -49,7 +56,7 @@ export const CanchApp = () =>{
                                 <Route path='/administracion/canchas/editar/:id/crear_disponibilidad/:day' element={<AddAvailability />} />
                                 <Route path='/administracion/canchas/editar/:id/crear_disponibilidades' element={<AddAvailabilities />} />
                                 <Route path='/administracion/canchas/editar/:id/crear_reservas' element={<AddReservations />} />
-
+                                <Route path='/administracion/reservas' element={<AdminReservations />} />
                             </Route>
                             {/* Protected Routes for ADMIN*/}
                             <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN"]}/>}>
@@ -62,10 +69,10 @@ export const CanchApp = () =>{
                             {/* Protected Routes for anyone registered*/}
                             <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER"]}/>}>
                                 <Route path='/perfil' element={<UserInfoPage />}/>
+                                <Route path='/establecimientos/:id/:sport/reservar' element={<ReserveByStablishmentAndSportPage />} />
                             </Route>
                             {/*Public Routes*/}
                             <Route path='/establecimientos/:id' element={<StablishmentInfo />} />
-                            <Route path='/establecimientos/:id/:sport/reservar' element={<ReserveByStablishmentAndSportPage />} />
                             <Route path='/establecimientos/buscar/:sport' element={<SearchStablishmentsBySport />} />
                             <Route path='/canchas/reservar/:sport/:city/:date' element={<ReserveByCitySportAndDate />} />
                             
@@ -78,6 +85,7 @@ export const CanchApp = () =>{
                         </Routes>
                     
                     <FooterComponent />
+                    </LoadingProvider>
             </StablishmentProvider>
         </AuthProvider>
         </>

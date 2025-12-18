@@ -1,17 +1,19 @@
 import Swal from "sweetalert2";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useApi } from "../../context/AxiosInstance";
+import { LoadingContext } from "../../context/LoadingContext";
 
 export const Step3 = ({ formData,setFormData, onNext, onBack }) => {
     const [error, setError] = useState(null);
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
     const api = useApi()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
 
     /* upload the imgages to the backend*/
     const uploadFiles = async () => {
         try{
-            setUploading(true);
+            startLoading()
             const uploadData = new FormData();
             files.forEach(file => {
                 uploadData.append("files", file);
@@ -34,7 +36,7 @@ export const Step3 = ({ formData,setFormData, onNext, onBack }) => {
                 icon: "error"
             });
         } finally {
-            setUploading(false);
+            stopLoading();
         }
     }
 

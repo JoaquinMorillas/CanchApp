@@ -123,6 +123,23 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
             style={{ maxWidth: "250px" }}/>
           
         </div>
+        {/*Phone input*/}
+        <div class="mb-3 d-flex align-items-center">
+          
+            <label  className="me-3 mb-0"
+            style={{  width: "250px", textAlign: "right" }}>
+              Número de Teléfono: 
+            </label>
+          
+            <input 
+            type="text" 
+            class="form-control"
+            value={formData.telephoneNumber}
+            onChange={(e) => setFormData({...formData, telephoneNumber: e.target.value })} 
+            placeholder='Ej: 541100000'
+            style={{ maxWidth: "250px" }}/>
+          
+        </div>
         {/*Description input*/}
         <div class="mb-3 d-flex align-items-center">
           

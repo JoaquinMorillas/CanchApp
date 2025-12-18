@@ -20,6 +20,7 @@ public class StablishmentCreationMapper {
         .street(stablishment.getAddress().getStreet())
         .number(stablishment.getAddress().getNumber())
         .province(stablishment.getAddress().getNumber())
+        .telephoneNumber(stablishment.getTelephoneNumber())
         .amenities(stablishment.getAmenities().stream()
                                 .map(AmenityMapper::toDTO)
                                 .collect(Collectors.toSet())

@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, NavLink } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { InputComponent } from '../Component/InputComponent'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const EditSportFieldPage = () => {
     /* Used Params */
     const api = useApi()
     const { id } = useParams()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const navigate = useNavigate()
     
     const [SportField, setSportField] = useState(null)
@@ -80,6 +82,7 @@ export const EditSportFieldPage = () => {
             }
 
             try{
+                startLoading()
                 const response = api.put(`/sport_field/update/${id}`, formData)
                 const updatedSportField = response.data
                 setSportField(updatedSportField)
@@ -102,6 +105,8 @@ export const EditSportFieldPage = () => {
                    text: error.response?.data?.message || error.response?.data || error.message,
                    icon: "error"
                    }); 
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -119,6 +124,7 @@ export const EditSportFieldPage = () => {
         if(confirmed.isConfirmed){
 
             try{
+                startLoading()
                 await api.delete(`/availability/delete/${id}`)
                 const updatedAvailabilites = availabilites.filter((a) => a.id != id)
                 setAvailabilities(updatedAvailabilites)
@@ -129,6 +135,8 @@ export const EditSportFieldPage = () => {
                    text: error.response?.data?.message || error.response?.data || error.message,
                    icon: "error"
                    });
+            }finally{
+                stopLoading()
             }
         }
         

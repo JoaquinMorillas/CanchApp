@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.joaquin.CanchApp.dto.ReservationDTO;
 import com.joaquin.CanchApp.dto.SlotDTO;
-
+import com.joaquin.CanchApp.entity.Slot;
+import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.ReservationIdNotFoundException;
+import com.joaquin.CanchApp.exception.ReservationIsAlreadyConfirmedException;
+import com.joaquin.CanchApp.exception.ReservationUserIdIsDiferentFromTheIdSuppliedException;
+import com.joaquin.CanchApp.exception.ReservationUserIsNullException;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
@@ -56,12 +61,12 @@ public class ReservationController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PostMapping("/generate-slots")
-    public ResponseEntity<List<ReservationDTO>> generateSlotsForDateRange(
+    public ResponseEntity<List<SlotDTO>> generateSlotsForDateRange(
         @RequestParam Integer sportFieldId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) throws SportFieldIdNotFoundException{
-        List<ReservationDTO> slots = reservationService.generateSlotsForDateRange(sportFieldId, startDate, endDate);
+        List<SlotDTO> slots = reservationService.generateSlotsForDateRange(sportFieldId, startDate, endDate);
         return ResponseEntity.ok(slots);
     }
 
@@ -74,14 +79,19 @@ public class ReservationController {
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<ReservationDTO> cancelReservation(@PathVariable Integer id) throws ReservationIdNotFoundException{
-        ReservationDTO dto = reservationService.cancelReservation(id);
+    public ResponseEntity<ReservationDTO> cancelReservation(
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, ReservationUserIdIsDiferentFromTheIdSuppliedException, ReservationUserIsNullException{
+        
+        ReservationDTO dto = reservationService.cancelReservation(id, user.getId());
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/confirm/{sportFieldId}/{userId}")
-    public ResponseEntity<ReservationDTO> confirmReservation(@PathVariable Integer sportFieldId, @PathVariable Integer userId) throws ReservationIdNotFoundException, UserIdNotFoundException{
-        ReservationDTO dto = reservationService.confirmReservarion(sportFieldId, userId);
+    @PutMapping("/confirm/{reservationId}")
+    public ResponseEntity<ReservationDTO> confirmReservation(
+        @PathVariable Integer reservationId, 
+        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException{
+        ReservationDTO dto = reservationService.confirmReservarion(reservationId, user.getId());
         return ResponseEntity.ok(dto);
     }
 }

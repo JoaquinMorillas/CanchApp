@@ -15,6 +15,7 @@ export const AddStablishmentPage = () => {
     ownerId: "",
     name: "",
     description:"",
+    telephoneNumber:"",
     country: "",
     city: "",
     postalCode: "",

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useApi } from '../context/AxiosInstance'
 import Swal from 'sweetalert2'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const AdminUsers = () => {
   const api = useApi()
+  const {startLoading, stopLoading} = useContext(LoadingContext)
   const [users, setUsers] = useState([])
   const [admins, setAdmins] = useState([])
   const [owners, setOwners] = useState([])
@@ -20,7 +22,7 @@ export const AdminUsers = () => {
     })
     if(confirmed.isConfirmed){
       try{
-
+        startLoading()
         await api.put(`/user/update/${userId}`, {"role" : newRol})
         
         Swal.fire({
@@ -41,6 +43,8 @@ export const AdminUsers = () => {
             text: error.response?.data?.message || error.response?.data || error.message,
             icon: "error"
             });
+        }finally{
+          stopLoading()
         }
       }
 
@@ -50,7 +54,7 @@ export const AdminUsers = () => {
   useEffect(() => {
     const getUsers = async () => {
       try{
-
+        startLoading()
         const response = await api.get("/user/all")
         const gettedUsers = response.data
         setUsers(gettedUsers)
@@ -63,6 +67,8 @@ export const AdminUsers = () => {
           text: error.response?.data?.message || error.response?.data || error.message,
           icon: "error"
         })
+      }finally{
+        stopLoading()
       }
       
       

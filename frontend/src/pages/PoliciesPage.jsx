@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useApi } from '../context/AxiosInstance'
 import { InputComponent } from '../Component/InputComponent'
 import Swal from 'sweetalert2'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const PoliciesPage = () => {
     const api = useApi()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const [policies, setPolicies] = useState([])
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
@@ -42,6 +44,7 @@ export const PoliciesPage = () => {
 
         if(confirm.isConfirmed){
             try{
+                startLoading()
                 const response = await api.post("/policy/save",{title, description})
                 const savedPolicy = response.data
                 Swal.fire({
@@ -58,6 +61,8 @@ export const PoliciesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -72,6 +77,7 @@ export const PoliciesPage = () => {
         })
         if(confirm.isConfirmed){
             try{
+                startLoading()
                 const response = await api.delete(`/policy/delete/${id}`)
                 Swal.fire({
                     title:"Exito",
@@ -85,6 +91,8 @@ export const PoliciesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -117,7 +125,7 @@ export const PoliciesPage = () => {
         })
         if(confirm.isConfirmed){
             try{
-
+                startLoading()
                 const response = await api.put(`policy/update/${id}`,
                     {"title": editTitle, "description": editDescription }
                 )
@@ -137,6 +145,8 @@ export const PoliciesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
     }

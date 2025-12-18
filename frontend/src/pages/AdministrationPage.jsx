@@ -4,11 +4,13 @@ import { NavLink, Link } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { useApi } from '../context/AxiosInstance'
 import { AuthContext } from '../context/AuthContext'
+import { LoadingContext } from '../context/LoadingContext'
 
 
 export const AdministrationPage = () => {
   const {user} = useContext(AuthContext)
   const api = useApi()
+  const {startLoading, stopLoading} = useContext(LoadingContext)
   const { stablishments, deleteStablishment } = useContext(StablishmentContext)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -26,6 +28,7 @@ export const AdministrationPage = () => {
     })
     if(confirmed.isConfirmed){
       try{
+        startLoading()
         await deleteStablishment(stablishment.id)
         const updatedStablishments = allStablishments.filter((s) => s.id != stablishment.id)
         setAllStablishments(updatedStablishments)
@@ -43,6 +46,8 @@ export const AdministrationPage = () => {
           text: error.response?.data?.message || error.response?.data || error.message,
           icon: "error"
           });
+      }finally{
+        stopLoading()
       }
     }
   }
@@ -50,11 +55,14 @@ export const AdministrationPage = () => {
   useEffect(() =>{
     const fetchStablishmentByOwner = async () => {
       try{
+        startLoading()
         const response = await api.get(`stablishment/user/${user.id}`)
         const gettedStablishments = response.data
         setAllStablishments(gettedStablishments)
       }catch(error){
         console.error(error)
+      }finally{
+        stopLoading()
       }
     }
     if(user.roles == "ROLE_ADMIN"){
@@ -112,10 +120,19 @@ export const AdministrationPage = () => {
           <NavLink to="/administracion/deportes">
               <button className='btn btn-primary ms-5 btn-lg'>Administrar Deportes</button>
             </NavLink>
+
+          <NavLink to="/administracion/reservas">
+              <button className='btn btn-primary ms-5 btn-lg'>Administrar Reservas</button>
+            </NavLink>
           
         </div>
         )}
 
+        {user.roles == "ROLE_OWNER" && (
+          <NavLink to="/administracion/reservas">
+              <button className='btn btn-primary ms-5 btn-lg'>Administrar Reservas</button>
+            </NavLink>
+        )}
 
         <h3 className='text-center mb-5'> Establecimientos: </h3>
 

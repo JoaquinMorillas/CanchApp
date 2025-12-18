@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { InputComponent } from '../Component/InputComponent'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const EditAvailability = () => {
     /*Used States */
     const api = useApi()
     const { id } = useParams()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const navigate = useNavigate()
     const [availability, setAvailability] = useState(null)
 
@@ -50,7 +52,7 @@ export const EditAvailability = () => {
         }
         if(confirmed.isConfirmed){
             try{
-
+                startLoading()
                 const response = await api.put(`/availability/update/${id}`, formData)
                 const updatedAvailability = response.data
                 setAvailability(updatedAvailability)
@@ -73,6 +75,8 @@ export const EditAvailability = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                     }); 
+            }finally{
+                stopLoading()
             }
 
         }
@@ -81,7 +85,7 @@ export const EditAvailability = () => {
     useEffect(() => {
         const fetchAvailability = async () =>{
             try{
-
+                startLoading()
                 const response = await api.get(`/availability/${id}`)
                 const serchedAvailability = response.data
 
@@ -97,6 +101,8 @@ export const EditAvailability = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                     });
+            }finally{
+                stopLoading()
             }
         }
 

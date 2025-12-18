@@ -40,6 +40,75 @@ public class EmailService {
         }
     }
 
+    public void sendCancelReservationEmail(
+        String to,
+        String name,
+        String sportField,
+        String stablishment,
+        String day,
+        String beginingHour,
+        String phoneNumber
+
+    ){
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("sportField", sportField);
+        context.setVariable("stablishment", stablishment);
+        context.setVariable("day", day);
+        context.setVariable("beginingHour",beginingHour);
+        context.setVariable("phoneNumber",phoneNumber);
+        
+        String htmlEmail = templateEngine.process("cancelReservationTemplate", context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try{
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(to);
+            helper.setText(htmlEmail, true);
+            helper.setSubject("CanchApp: Tu Reserva ha sido Cancelada");
+            mailSender.send(message);
+            System.out.println("Mesaje enviado");
+        }catch(MessagingException ex){
+            throw new RuntimeException("Failed to send email", ex);
+        }
+    }
+
+    public void sendConfirmReservarionEmail(
+        String to,
+        String name,
+        String sportField,
+        String stablishment,
+        String day,
+        String beginingHour,
+        String location
+    ){
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("sportField", sportField);
+        context.setVariable("stablishment", stablishment);
+        context.setVariable("day", day);
+        context.setVariable("beginingHour",beginingHour);
+        context.setVariable("location",location);
+
+        String htmlEmail = templateEngine.process("confirmReservationTemplate", context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try{
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(to);
+            helper.setText(htmlEmail, true);
+            helper.setSubject("CanchApp: Reserva Confirmada");
+            mailSender.send(message);
+            System.out.println("Mesaje enviado");
+        }catch(MessagingException ex){
+            throw new RuntimeException("Failed to send email", ex);
+        }
+
+    }
     public void sendTestEmail(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

@@ -1,14 +1,16 @@
 import { useApi } from '../context/AxiosInstance'
-import React, {  useState } from 'react'
+import React, {  useContext, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { InputComponent } from '../Component/InputComponent'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const AddAvailability = () => {
 
     /*Used states*/
     const api = useApi()
     const { id, day } = useParams()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     
     const navigate = useNavigate()
     const [availability, setAvailability] = useState(null)
@@ -44,7 +46,7 @@ export const AddAvailability = () => {
 
       if(confirmed.isConfirmed){
         try{
-
+          startLoading()
           const formData = {
             sportFieldId: id,
             dayOfWeek: day,
@@ -74,6 +76,8 @@ export const AddAvailability = () => {
             text: error.response?.data?.message || error.response?.data || error.message,
             icon: "error"
             }); 
+        }finally{
+          stopLoading()
         }
       }
     }

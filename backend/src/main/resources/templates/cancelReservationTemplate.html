@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; font-family: Arial, sans-serif;">
+
+<!-- Header -->
+<div style="background-color:#54cb1c; color:#212529; padding: 20px; text-align:center;">
+    <a href="http://localhost:5173/">
+
+        <img src="https://res.cloudinary.com/dodsbwa5f/image/upload/v1764159828/canchApp_logo.-removebg-preview_ysqwd0.png" 
+             alt="Logo" width="100" height="80" style="vertical-align:middle; max-width:100%; height:auto;" />
+        
+    </a>
+    <a href="http://localhost:5173/">
+
+        <span style="font-weight:bold; font-size:18px; margin-left:10px; display:block; margin-top:10px;
+        color:#212529; text-decoration: none;">
+            CanchApp | Juga más, busca menos
+        </span>
+    </a>
+</div>
+
+<!-- Body -->
+<div style="padding: 20px;">
+    <h2 style="color:#3D5A80; font-size:22px; margin-bottom:10px;">
+        ¡Hola [[${name}]]!</h2>
+    <p style="font-size:16px; line-height:1.5;">
+        Tu reserva en la cancha "[[${sportField}]]" en establecimiento "[[${stablishment}]]", para el día [[${day}]] a las [[${beginingHour}]]
+        ha sido cancelada.
+
+        Para comunicarte con el establecimento puedes hacer Click 
+        <a th:href="'https://wa.me/' + ${phoneNumber}"
+        target='_blank'
+        rel="noopener noreferrer">
+            AQUI
+        </a>
+        
+    </p>
+    
+    <p>
+
+        <a href="http://localhost:5173/perfil"
+        style="font-size:25px; line-height:1.5;"> 
+            Ver mis reservas en mi perfil
+        </a>
+    </p>
+    <p>
+
+        <a href="http://localhost:5173/"
+        style="font-size:16px; line-height:1.5;"> 
+            Ir a CanchAPP
+        </a>
+    </p>
+</div>
+
+<!-- Footer -->
+<div style="background-color:#3D5A80; color:#F0F1F6; padding: 15px; text-align:center; font-size:12px;">
+    <span>©2025 CanchApp</span>
+    <div style="margin-top:10px;">
+        <a href="#" style="margin:0 5px;"><img src="https://res.cloudinary.com/dodsbwa5f/image/upload/v1759454603/icons8-instagram-32_bbyduu.png" alt="Instagram" width="24" height="24" style="max-width:100%; height:auto;" /></a>
+        <a href="#" style="margin:0 5px;"><img src="https://res.cloudinary.com/dodsbwa5f/image/upload/v1759454603/icons8-facebook-nuevo-32_ketgti.png" alt="Facebook" width="24" height="24" style="max-width:100%; height:auto;" /></a>
+        <a href="#" style="margin:0 5px;"><img src="https://res.cloudinary.com/dodsbwa5f/image/upload/v1759454604/icons8-x-32_pepd3d.png" alt="X" width="24" height="24" style="max-width:100%; height:auto;" /></a>
+    </div>
+</div>
+
+</body>
+</html>

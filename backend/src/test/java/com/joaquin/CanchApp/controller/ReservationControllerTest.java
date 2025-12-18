@@ -28,9 +28,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.joaquin.CanchApp.dto.ReservationDTO;
+import com.joaquin.CanchApp.dto.SlotDTO;
 import com.joaquin.CanchApp.entity.Availability;
 import com.joaquin.CanchApp.entity.Reservation;
 import com.joaquin.CanchApp.entity.ReservationStatus;
+import com.joaquin.CanchApp.entity.Slot;
 import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 import com.joaquin.CanchApp.repository.AvailabilityRespository;
@@ -93,10 +95,10 @@ public class ReservationControllerTest {
         availabilityRepository.save(wed);
         availabilityRepository.flush();
         
-        List<ReservationDTO> dtosSaved = reservationService.generateSlotsForDateRange(1, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 25));
+        List<SlotDTO> dtosSaved = reservationService.generateSlotsForDateRange(1, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 25));
 
         reservationsIds = dtosSaved.stream()
-        .map(ReservationDTO::getId)
+        .map(SlotDTO::getId)
         .collect(Collectors.toList());
         
         Reservation r = Reservation.builder()

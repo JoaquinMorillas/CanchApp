@@ -10,12 +10,15 @@ import withReactContent from "sweetalert2-react-content";
 
 import { LeftArrowComponent } from '../Component/LeftArrowComponent'
 import { AuthContext } from '../context/AuthContext'
+import { LoadingContext } from '../context/LoadingContext'
+import { WhatsappButtonComponent } from '../Component/WhatsappButtonComponent'
 
 export const StablishmentInfo = () => {
     /* used States */
     const api = useApi()
     const { id } = useParams()
     const { user } = useContext(AuthContext)
+    const {startLoading, stopLoading} = useContext(LoadingContext)
 
     const [stablishment, setStablishment] = useState(null)
     const [showModal, setShowModal] = useState(false)
@@ -27,6 +30,7 @@ export const StablishmentInfo = () => {
     const [street, setStreet] = useState("")
     const [number, setNumber] = useState("")
     const [sports, setSports] = useState([])
+    const [telephoneNumber, setTelephoneNumber] = useState("")
     const [amenities, setAmenities] = useState([])
     const [policies, setPolicies] = useState([])
     const [ratings, setRatings] = useState([])
@@ -86,6 +90,7 @@ export const StablishmentInfo = () => {
             }
             
             try{
+                startLoading()
                 const apiResponse = await api.post(`rating/rate/${id}`, {"value":rating, "opinion":opinion})
                 const data = apiResponse.data
                 Swal.fire({
@@ -112,6 +117,8 @@ export const StablishmentInfo = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
             
         }
@@ -165,6 +172,7 @@ export const StablishmentInfo = () => {
             setAmenities(gettedStablishment.amenities)
             setPolicies(gettedStablishment.policies)
             setRatings(gettedStablishment.ratings)
+            setTelephoneNumber(gettedStablishment.telephoneNumber)
             
         }
         
@@ -202,6 +210,7 @@ export const StablishmentInfo = () => {
     },[stablishment, street, number, city])
   return ( 
     <>  
+    <WhatsappButtonComponent telephoneNumber={telephoneNumber} userName={user?.firstName} stablishmentName={name}/>
     <div style={{maxWidth:"95%", margin:"0 auto", backgroundColor:"var(--bs-light)"}}>
 
         <LeftArrowComponent />

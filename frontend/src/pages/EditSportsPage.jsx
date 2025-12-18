@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useApi } from '../context/AxiosInstance'
 import { InputComponent } from '../Component/InputComponent'
 import Swal from 'sweetalert2'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const EditSportsPage = () => {
   
     const api = useApi()
-
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const [sports, setSports] = useState([])
 
     const [name, setName] = useState("")
@@ -45,6 +46,7 @@ export const EditSportsPage = () => {
 
         if(confirm.isConfirmed){
             try{
+                startLoading()
                 const uploadData = new FormData();  
                 uploadData.append("files", icon);;
                 const iconResponse = await api.post("/images/upload", uploadData);
@@ -79,6 +81,8 @@ export const EditSportsPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
 
@@ -96,6 +100,7 @@ export const EditSportsPage = () => {
 
         if (confirm.isConfirmed){
             try{
+                startLoading()
                 const response = await api.delete(`/sport/delete/${id}`)
                 const msg = response.data
                 setSports(sports.filter((s) => s.id !== id))
@@ -112,6 +117,8 @@ export const EditSportsPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -148,6 +155,7 @@ export const EditSportsPage = () => {
             }
 
             try{
+                startLoading()
                 const response = await api.put(`/sport/update/${sport.id}`, sentSport)
                 const updatedSport = response.data
                 setSports(sports.map((s) => s.id === updatedSport.id ? updatedSport : s))
@@ -169,6 +177,8 @@ export const EditSportsPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         }
     }

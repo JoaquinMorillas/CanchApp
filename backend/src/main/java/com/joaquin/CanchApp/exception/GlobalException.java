@@ -126,4 +126,19 @@ public class GlobalException {
     public ResponseEntity<String> handleSportNameNotFoundException(SportNameNotFoundException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(ReservationIsAlreadyConfirmedException.class)
+    public ResponseEntity<String> handleReservationIsAlreadyConfirmedException(ReservationIsAlreadyConfirmedException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+
+    }
+    @ExceptionHandler(ReservationUserIdIsDiferentFromTheIdSuppliedException.class)
+    public ResponseEntity<String> handleReservationUserIdIsDiferentFromTheIdSuppliedException(ReservationUserIdIsDiferentFromTheIdSuppliedException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ReservationUserIsNullException.class)
+    public ResponseEntity<String> handleReservationUserIsNullException(ReservationUserIsNullException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

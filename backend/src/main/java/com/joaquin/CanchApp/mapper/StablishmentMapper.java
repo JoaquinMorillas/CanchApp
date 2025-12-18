@@ -16,6 +16,7 @@ public class StablishmentMapper {
         .city(stablishment.getAddress().getCity())
         .street(stablishment.getAddress().getStreet())
         .number(stablishment.getAddress().getNumber())
+        .telephoneNumber(stablishment.getTelephoneNumber())
         .sports(stablishment.getSportFields().stream()
                 .map((sf) -> sf.getSport())
                 .distinct()

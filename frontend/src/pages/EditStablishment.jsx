@@ -4,12 +4,14 @@ import { StablishmentContext } from '../context/StablishmentContext'
 import Swal from 'sweetalert2'
 import { useApi } from '../context/AxiosInstance'
 import { InputComponent } from '../Component/InputComponent'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const EditStablishment = () => {
 
     /* used States */
     const api = useApi()
     const { id } = useParams()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const { stablishments, updateStablishment } = useContext(StablishmentContext)
     const [stablishment, setStablishment] = useState(null)
     const navigate = useNavigate()
@@ -27,6 +29,10 @@ export const EditStablishment = () => {
     const [selectedAmenities, setSelectedAmenities] = useState([])
     const [enableSelectedAmenities, setEnableSelectedAmenities] = useState(true)
 
+    const [policies, setPolicies] = useState([])
+    const [selectedPolicies, setSelectedPolicies] = useState([])
+    const [enablePolicies, setEnablePolicies] = useState(true)
+
     const [images, setImages] = useState([])
 
     const [files, setFiles] = useState([])
@@ -37,7 +43,7 @@ export const EditStablishment = () => {
     /* main function, saves the changes and navigate back to administation panel */
     const saveChanges = async () =>{
         try{
-            
+            startLoading()
             const uploadForm = new FormData();
             files.forEach((file) =>{
                 uploadForm.append("files", file)
@@ -59,7 +65,8 @@ export const EditStablishment = () => {
                 street: street,
                 number: number,
                 images: updatedImages,
-                amenities: selectedAmenities
+                amenities: selectedAmenities,
+                policies: selectedPolicies
             }
             
             
@@ -86,6 +93,8 @@ export const EditStablishment = () => {
                icon: "error"
              });
 
+        }finally{
+            stopLoading()
         }
     }
 
@@ -102,6 +111,7 @@ export const EditStablishment = () => {
 
         if(confirmed.isConfirmed){
             try{
+                startLoading()
                 await api.delete(`/sport_field/delete/${sportField.id}`)
                 const updatedSportsFields = sportFields.filter((s) => s.id != sportField.id)
                 setSportFields(updatedSportsFields)
@@ -111,6 +121,8 @@ export const EditStablishment = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                     });
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -129,6 +141,7 @@ export const EditStablishment = () => {
             if(confirmed.isConfirmed){
 
                 try{
+                    startLoading()
                     await api.delete(`/images/delete/${image.publicId}`)
                     const updatedImages = images.filter((i)=> i.publicId != image.publicId)
                     setImages(updatedImages)
@@ -160,6 +173,8 @@ export const EditStablishment = () => {
                     icon: "error"
                     });
         
+                }finally{
+                    stopLoading()
                 }
             }
         }
@@ -205,6 +220,7 @@ export const EditStablishment = () => {
             setNumber(found.number)
             setImages(found.images)
             setSelectedAmenities(found.amenities)
+            setSelectedPolicies(found.policies)
         }
         
     }, [id, stablishments])
@@ -216,7 +232,13 @@ export const EditStablishment = () => {
             const gettedAmenities = response.data
             setAmenities(gettedAmenities)
         }
+        const fechPolicies = async () => {
+            const response = await api.get("/policy/all")
+            const gettedPolicies = response.data
+            setPolicies(gettedPolicies)
+        }
         fecthAmenities()
+        fechPolicies()
     },[])
 
     /* fecth the sportfields assigned to the stablishment and set the states */
@@ -422,6 +444,57 @@ export const EditStablishment = () => {
         </table>
             </div>
 
+            {/* policies inputs*/}
+            <h5 className='text-center'>Politicas</h5>
+            <div className='text-center'>
+
+                <button className={`btn ${enablePolicies ? "btn-primary" : "btn-danger"} mb-4`}
+                onClick={() => setEnablePolicies(!enablePolicies)}>
+                    {enablePolicies ? "Editar" : "Confirmar"}
+                    </button>
+            </div>
+            <table className='table table-striped table-hover'>
+                <thead>
+                    <tr>
+                        <th scope="col" className='text-center'>Título</th>
+                        <th scope="col" className='text-center'>Descripción<noscript></noscript></th>
+                        <th scope='col' className='text-center'>Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {policies?.length > 0 && (
+                        policies.map((policy,idx) => {
+                            const isChecked = selectedPolicies.some((p) => p.id === policy.id)
+                            const handleCheck = (e) => {
+                                if(e.target.checked){
+                                    setSelectedPolicies([...selectedPolicies, policy])
+                                    setFormData({...formData, policies:selectedPolicies})
+                                }else{
+                                    setSelectedPolicies(selectedPolicies.filter((p) => p.id!==policy.id))
+                                    setFormData({...formData, policies:selectedPolicies})
+                                }
+                            }
+                                return(
+                                    <tr key={idx}>
+                                        <th className='text-center'>{policy.title}</th>
+                                        <td className='text-center'>
+                                            {policy.description}
+                                        </td>
+                                        <td className='text-center'>
+                                            <input type="checkbox"
+                                            disabled={enablePolicies}
+                                            checked={isChecked}
+                                            onChange={handleCheck} />
+
+                                        </td>
+                                    </tr>
+                                )
+                            
+                        })
+                    )}
+                </tbody>
+            </table>
+
             <div className="mb-3 d-flex justify-content-center">
                 <button className='btn btn-lg btn-primary mt-5' onClick={saveChanges}>
                     Guardar Cambios
@@ -465,7 +538,7 @@ export const EditStablishment = () => {
                                         {parseDuration(s.reservationDuration)}
                                     </td>
                                     <td className="text-center align-middle">
-                                        {s.sport}
+                                        {s.sportName}
                                     </td>
                                     <td>
                                         <div className="d-flex justify-content-center gap-2">

@@ -47,9 +47,9 @@ export const useApi = () => {
                         return api(error.config)
                     }catch{
                         Swal.fire({
-                            title:"Error",
-                            text:"Hubo un error, el sistema va a cerrar sesion",
-                            icon:"error",
+                            title:"Sesion Expirada",
+                            text:"Su sesion expiro, para volver a ingresar dirigete a 'Iniciar Sesion'.",
+                            icon:"warning",
                             showCloseButton:true
                         })
                         logOut()

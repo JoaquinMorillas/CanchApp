@@ -35,6 +35,8 @@ public class SportField {
     private Double price;
     private Duration reservationDuration;
 
+    
+
 
     @ManyToOne
     @JoinColumn(name = "stablishment_id")
@@ -42,6 +44,9 @@ public class SportField {
 
     @OneToMany(mappedBy = "sportField", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
+
+    @OneToMany(mappedBy = "sportField", cascade = CascadeType.ALL)
+    private List<Slot> slots;
 
     @OneToMany(mappedBy = "sportField", cascade = CascadeType.ALL)
     private List<Availability> availabilities;

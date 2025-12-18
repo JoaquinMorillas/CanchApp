@@ -1,19 +1,63 @@
 import { useApi } from '../context/AxiosInstance';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useParams, NavLink } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import { LoadingContext } from '../context/LoadingContext'
 
 export const ReserveByCitySportAndDate = () => {
     /* used States */
     const api = useApi()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const baseUrl = "http://localhost:8080"
     const params = useParams()
     const [sportFields, setSportFields] = useState([])
     const [slotsBySportFields, setSlotsBySportFields] = useState({})
     const [stablishmentsBySportFields, setStablishmentsBySportFields] = useState({})
     
+
+    /* handle the confirm reservation */
+    const handleConfirmReservation = async(reservation) => {
+        const confirm = await Swal.fire({
+            title:"Atencion",
+            text: `¿Estas seguro que quieres reservar esta cancha?`,
+            icon: "question",
+            showCancelButton:true,
+            showConfirmButton:true
+        })
+
+        if(confirm.isConfirmed){
+            try{
+                startLoading()
+                const response = await api.put(`/reservation/confirm/${reservation.id}`)
+                const data = response.data
+                Swal.fire({
+                    title:"Exito",
+                    text:"¡Ya reservaste tu cancha!",
+                    icon:"success",
+                    showCloseButton:true
+                })
+                const sportFieldId = reservation.sportFieldId
+                setSlotsBySportFields(prev => ({
+                    ...prev,
+                    [sportFieldId] : prev[sportFieldId].map(slot =>
+                        slot.id === reservation.id
+                        ? {...slot, avilable:false}
+                        : slot
+                    )
+                }))
+            }catch(error){
+                Swal.fire({
+                    title: "Error",
+                    text: error.response?.data?.message || error.response?.data || error.message,
+                    icon: "error"
+                })
+            }finally{
+                stopLoading()
+            }
+        }
+    }
     /* parse the sport getted by the backend and transfoms it
     to lower case and replace the "_" to " " */
     const formatSport = (sport) => {
@@ -32,6 +76,7 @@ export const ReserveByCitySportAndDate = () => {
     useEffect(() => {
         const fetchSportFields= async () => {
             try{
+                startLoading()
                 const response = await api.get(
                     `/sport_field/find?sport=${encodeURIComponent(params.sport)}&city=${encodeURIComponent(params.city)}`)
                 const gettedSportFields = response.data
@@ -42,6 +87,8 @@ export const ReserveByCitySportAndDate = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         }
        
@@ -55,6 +102,7 @@ export const ReserveByCitySportAndDate = () => {
         const fetchAllSlots = async () => {
             const slots = {}
             try{
+                startLoading()
                 await Promise.all(
                     sportFields.map(async (sportField) => {
                         const response = await api.get(`/reservation/sport-field/${sportField.id}/slots?date=${params.date}`)
@@ -64,6 +112,8 @@ export const ReserveByCitySportAndDate = () => {
                 )
             }catch(error){
                 console.error(error)
+            }finally{
+                stopLoading()
             }
             setSlotsBySportFields(slots)
         }
@@ -79,6 +129,7 @@ export const ReserveByCitySportAndDate = () => {
         const fetchStablishments = async () => {
             const stablishments = {}
             try{
+                startLoading()
                 await Promise.all(
                     sportFields.map(async (sportField) => {
                         const response = await api.get(`/stablishment/${sportField.stablishmentId}`)
@@ -89,6 +140,8 @@ export const ReserveByCitySportAndDate = () => {
                 setStablishmentsBySportFields(stablishments)
             }catch(error){
                 console.error(error)
+            }finally{
+                stopLoading()
             }
         }
 
@@ -127,12 +180,13 @@ export const ReserveByCitySportAndDate = () => {
 
                                                 {slots.map((slot ,i) => (
                                                     <div key={i} className='col-6'>
-                                                        <button className={`btn ${slot.reserved ? 'btn-danger' : 'btn-success '} mb-2 w-100`}
+                                                        <button className={`btn ${slot.available == false ? 'btn-danger' : 'btn-success'} mb-2 w-100`}
+                                                        onClick={() => handleConfirmReservation(slot)}
                                                         >
-                                                            {slot.beginingTime.slice(0,5)} 
+                                                            {slot.startTime.slice(0,5)} 
                                                             - 
-                                                            {slot.endingTime.slice(0,5)}
-                                                            <span className='d-block small'> {slot.reserved ? " No Disponible" : " Disponible"}</span>
+                                                            {slot.finishTime.slice(0,5)}
+                                                            <span className='d-block'> {slot.available == false ? " No Disponible" : " Disponible"}</span>
                                                         </button>
                                                     </div>
                                                 ))}

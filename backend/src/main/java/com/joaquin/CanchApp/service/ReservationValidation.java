@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.joaquin.CanchApp.dto.ReservationDTO;
 import com.joaquin.CanchApp.dto.SlotDTO;
+import com.joaquin.CanchApp.entity.ReservationStatus;
 import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.repository.SportFieldRepository;
@@ -31,16 +32,18 @@ public class ReservationValidation {
 
         return expectedDuration.equals(supliedDuration);
     }
+    /*
 
     public boolean checkBeginingHour(ReservationDTO reservation, List<SlotDTO> slots){
         List<LocalTime> beginingTimes = new ArrayList<>();
 
         for(SlotDTO slot : slots){
-            if(slot.isReserved() != true){
-                beginingTimes.add(slot.getBeginingTime());
+            if(slot.getReservationStatus() != ReservationStatus.CONFIRMED){
+                beginingTimes.add(slot.getBeginingHour());
             }
         }
 
         return beginingTimes.contains(reservation.getBeginingHour());
     }
+     */
 }

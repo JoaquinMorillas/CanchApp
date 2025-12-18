@@ -5,7 +5,7 @@ export const Unauthorized = () => {
   return (
     <div>
       <h1 className='text-center'>Ups...</h1>
-      <h2 className='text-center'>Al parecer no tienes accesso a esta página</h2>
+      <h2 className='text-center'>Para poder acceder a esta sección debes estar loggeado</h2>
       <div className='d-flex align-itmes-center justify-content-center m-5'>
 
         <Link to="/login">

@@ -1,16 +1,17 @@
 import React, { useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import { Navigate, Outlet } from 'react-router-dom'
+import { Unauthorized } from '../pages/Unauthorized'
 
 
 export const ProtectedRoute = ({authRoles}) => {
     const {user} = useContext(AuthContext)
 
     if(!user){
-        return <Navigate to="/no_autorizado" replace></Navigate>
+        return <Unauthorized />
     }
 
     const isAuthorized = user.roles.some(r => authRoles.includes(r))
-    return isAuthorized ? <Outlet /> : <Navigate to="/no_autorizado" replace />
+    return isAuthorized ? <Outlet /> : <Unauthorized />
   
 }

@@ -4,11 +4,13 @@ import { useApi } from '../../context/AxiosInstance';
 import { useContext, useState } from 'react';
 import { StablishmentContext } from '../../context/StablishmentContext';
 import { useNavigate } from 'react-router-dom';
+import { LoadingContext } from '../../context/LoadingContext';
 
 export const Step4 = ({ formData, onBack }) => {
     const { addStablishment } = useContext(StablishmentContext) 
     const [error, setError] = useState(null);
     const navigate = useNavigate()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
 
     useEffect(() => {
       console.log(formData);
@@ -45,11 +47,14 @@ export const Step4 = ({ formData, onBack }) => {
           <label label className="col-sm-4 col-form-label">Id del Dueño: </label>
           <span className="col-sm-8">{formData.ownerId}</span>
           <br />
+          <label label className="col-sm-4 col-form-label">Número de Teléfono: </label>
+          <span className="col-sm-8">{formData.telephoneNumber}</span>
+          <br />
           <label label className="col-sm-4 col-form-label">Prestaciones: </label>
           {formData.amenities?.length > 0 &&(
             formData.amenities.map((amenity, idx) => (
 
-              <p key={idx} className="col-sm-8">{amenity.name}</p>
+              <span key={idx} className="col-sm-8">{amenity.name}</span>
             ))
           )}
           <br />

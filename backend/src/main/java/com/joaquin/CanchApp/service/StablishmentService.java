@@ -93,6 +93,7 @@ public class StablishmentService {
                 .address(address)
                 .name(stablishmentCreationDTO.getName())
                 .description((stablishmentCreationDTO.getDescription()))
+                .telephoneNumber(stablishmentCreationDTO.getTelephoneNumber())
                 .images(stablishmentCreationDTO.getImages())
                 .sportFields(new ArrayList<>())
                 .amenities(amenities)

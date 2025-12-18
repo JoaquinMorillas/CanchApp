@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import Avatar from '@mui/material/Avatar'
+import { LoadingContext } from '../context/LoadingContext'
 import { InputComponent } from '../Component/InputComponent'
 import { useApi } from '../context/AxiosInstance'
 import { StablishmentContext } from '../context/StablishmentContext'
@@ -10,13 +11,23 @@ import Swal from 'sweetalert2'
 export const UserInfoPage = () => {
     const api = useApi()
     const navigate = useNavigate()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const {stablishments} = useContext(StablishmentContext)
     const allStablishments = stablishments.all
     const {user, deleteFavorite} = useContext(AuthContext)
     const [reservations, setReservations] = useState([])
+    const [sortedReservations, setSortedReservations] = useState([]) 
     const [ownedStablishments, setOwnedStablishments] = useState([])
     const [favorites, setFavorites] = useState([])
      
+    const [currentReservationPage, setCurrentReservationPage] = useState(1)
+    const totalItemsPerPage = 5
+    const totalReservationPages = Math.ceil(sortedReservations.length/totalItemsPerPage)
+    const startIndex = (currentReservationPage - 1) * totalItemsPerPage
+    const endIndex = startIndex + totalItemsPerPage
+    const currentReservations = sortedReservations.slice(startIndex,endIndex)
+
+
     const formatDate = (dateString) => {
       const [year, month, day] = dateString.split("-").map(Number);
       const date = new Date(year, month -1, day)
@@ -49,29 +60,74 @@ export const UserInfoPage = () => {
       showCancelButton:true
     })
     if(confirm.isConfirmed){
+      startLoading()
       await api.post(`/user/${user.id}/favorites/delete/${id}`)
       deleteFavorite(id)
 
       setFavorites((allStablishments.filter(stablishment => user.favorites.includes(stablishment.id))))
+      stopLoading()
     }
   }
   
-  useEffect(() => {
-    const getReservations = async () => {
+  const handleCancelReservation = async (reservation) => {
+    const confirm = await Swal.fire({
+      title:"Atencion",
+      text:"¿Estas seguro que quieres cancelar esta reserva?",
+      icon:"question",
+      showConfirmButton:true,
+      showCancelButton:true
+    })
+    if(confirm.isConfirmed){
       try{
-        const response = await api.get(`/reservation/user/${user.id}`)
-        const gettedReservations = response.data
-        setReservations(gettedReservations)
+        startLoading()
+        const response = await api.put(`/reservation/cancel/${reservation.id}`)
+        const canceledReservation = response.data
+        setReservations(prev => (
+          prev.map((reservation) => reservation.id == canceledReservation.id 
+          ? {...reservation, reservationStatus : "CANCELED"}
+          : reservation)
+        ))
+        setSortedReservations(prev => (
+          prev.map((reservation) => reservation.id == canceledReservation.id 
+          ? {...reservation, reservationStatus : "CANCELLED"}
+          : reservation)
+        ))
       }catch(error){
         Swal.fire({
           title:"Error al buscar las reservas",
           text:error.response?.data?.message || error.response?.data || error.message,
           icon:"error"
         })
+      }finally{
+        stopLoading()
+      }
+    }
+  }
+  useEffect(() => {
+    const getReservations = async () => {
+      try{
+        startLoading()
+        const response = await api.get(`/reservation/user/${user.id}`)
+        const gettedReservations = response.data
+        setReservations(gettedReservations)
+        setSortedReservations(gettedReservations.sort((a,b) => {
+          const firstDate = new Date(a.reservationDate)
+          const secondDate = new Date(b.reservationDate)
+          return(secondDate - firstDate)
+        }))
+      }catch(error){
+        Swal.fire({
+          title:"Error al buscar las reservas",
+          text:error.response?.data?.message || error.response?.data || error.message,
+          icon:"error"
+        })
+      }finally{
+        stopLoading()
       }
     }
     const getStablishments = async () => {
       try{
+        startLoading()
         const response = await api.get(`/stablishment/user/${user.id}`)
         const gettedStablishments = response.data
         setOwnedStablishments(gettedStablishments)
@@ -81,6 +137,8 @@ export const UserInfoPage = () => {
           text:error.response?.data?.message || error.response?.data || error.message,
           icon:"error"
         })
+    }finally{
+      stopLoading()
     }
   }
     
@@ -171,9 +229,10 @@ export const UserInfoPage = () => {
                   <th scope='col' className='text-center'>Estado de Reserva</th>
                 </tr>
               </thead>
-              <tbody>
-                {reservations.map((reservation) => (
-                  <tr key={reservation.id}>
+              <tbody style={{ minHeight: `${58 * totalItemsPerPage}px` }}>
+                {currentReservations.map((reservation) => (
+                  <tr key={reservation.id}
+                  >
                     <th className='text-center'>
                       {reservation.id}
                     </th>
@@ -189,15 +248,54 @@ export const UserInfoPage = () => {
                     <td className='text-center'>
                       {reservation.beginingHour.slice(0,5)} hs
                     </td>
-                    <td className='text-center'>
-                      {reservation.reservationStatus == "CONFIRMED" ? "Confirmado"
-                      : "Cancelado"}
+                    <td className='text-center'
+                    style={{ backgroundColor: reservation.reservationStatus == "CONFIRMED" 
+                  ? "var(--bs-primary)" 
+                  : reservation.reservationStatus == "CANCELLED" ? "var(--bs-danger)" : "var(--bs-warning)"}}>
+                      {reservation.reservationStatus == "CONFIRMED" 
+                      ? "CONFIRMADA"
+                      : reservation.reservationStatus == "FULLFILED" ? "COMPLETADA" : "CANCELADA"}
                     </td>
+                    <td>
 
+                    {reservation.reservationStatus == "CONFIRMED" && (
+                      <button className="btn btn-danger m-auto"
+                      onClick={() => handleCancelReservation(reservation)}>
+                        Cancelar Reserva
+                      </button>
+                    )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
-            </table> 
+            </table>
+            {/*Pagination Control*/}
+            <nav>
+                <ul className='pagination justify-content-center m-3'>
+                  <li className={`page-item ${currentReservationPage == 1 ? "disabled" : ""}`}>
+                    <button className='page-link'
+                    onClick={() => setCurrentReservationPage(prev => prev -1)}>
+                      Anterior
+                    </button>
+                  </li>
+                  {Array.from({length : totalReservationPages}).map((_, index) => (
+                    <li className={`page-item ${currentReservationPage == index+1 ? "disabled" : ""}`}>
+                      <button className='page-link'
+                      onClick={() => setCurrentReservationPage(index+1)}>
+                        {index +1 }
+                      </button>
+                      
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentReservationPage == totalReservationPages ? "disabled" : ""}`}>
+                    <button className='page-link'
+                    onClick={() => setCurrentReservationPage(prev => prev +1)}>
+                      Siguiente
+                    </button>
+
+                  </li>
+                </ul>
+            </nav> 
         </div>
         ):(
             <h3>Todavia No tienes ninguna Reserva...Explora la pagina de incio para comenzar a jugar!</h3>
@@ -245,7 +343,7 @@ export const UserInfoPage = () => {
                       )}
                     </td>
                     
-                    <td>
+                    <td className='text-center'>
                       <button className='btn btn-danger btn-sm'
                       style={{height:"50%", width:"75%", margin:"0 auto"}}
                       onClick={e => {e.stopPropagation(); handleDeleteFavorite(stablishment.id)}}>

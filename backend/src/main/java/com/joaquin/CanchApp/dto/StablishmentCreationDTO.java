@@ -16,6 +16,7 @@ public class StablishmentCreationDTO {
     private Integer ownerId;
     private String name;
     private String description;
+    private String telephoneNumber;
     @JsonProperty("images")
     private List<ImageInfo> images;
     @JsonProperty("amenities")

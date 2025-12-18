@@ -22,6 +22,7 @@ public class StablishmentDTO {
     private String street;
     private String number;
     private String description;
+    private String telephoneNumber;
 
     private List<Sport> sports;
 

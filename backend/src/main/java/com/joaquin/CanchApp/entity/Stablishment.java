@@ -40,6 +40,7 @@ public class Stablishment {
     private String name;
 
     private String description;
+    private String telephoneNumber;
 
     @ElementCollection
     @CollectionTable(

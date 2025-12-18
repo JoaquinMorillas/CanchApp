@@ -1,17 +1,19 @@
 import { useApi } from '../context/AxiosInstance';
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Swal from 'sweetalert2';
 import { InputComponent } from '../Component/InputComponent';
+import { LoadingContext } from '../context/LoadingContext';
 
 export const AddReservations = () => {
     /* Used States*/
     const api = useApi()
     const baseUrl = "http://localhost:8080"
     const { id } = useParams()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const navigate = useNavigate()
     const [sportField, setSportField] = useState(null)
     const [name, setName] = useState("")
@@ -85,6 +87,7 @@ export const AddReservations = () => {
         }
         specialDates.map(async (date) => {
             try{
+                startLoading()
                 const response = await api.post(`/availability/save`, date)
                 
             }catch(error){
@@ -93,6 +96,8 @@ export const AddReservations = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         })
     }
@@ -125,6 +130,7 @@ export const AddReservations = () => {
         if(confirmed.isConfirmed){
 
             try{
+                startLoading()
                 await saveSpecialDates()
                 const formattedBegining = beginingDate.toISOString().split("T")[0]
                 const formattedEnding = endingDate.toISOString().split("T")[0]
@@ -135,8 +141,7 @@ export const AddReservations = () => {
                     title:"Éxito", 
                     text: `Se crearon ${data.length} nuevas reservas`, 
                     icon: "success",
-                    timer:"2000",
-                    showConfirmButton:false
+                    showConfirmButton:true
                 })
                 setTimeout(() => {
                     navigate(-1)
@@ -148,6 +153,8 @@ export const AddReservations = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 })
+            }finally{
+                stopLoading()
             }
         }
 

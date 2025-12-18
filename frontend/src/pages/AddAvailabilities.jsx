@@ -1,12 +1,14 @@
-import {useState} from 'react'
+import {useContext, useState} from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { useApi } from '../context/AxiosInstance'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const AddAvailabilities = () => {
     const api = useApi()
     const { id } = useParams()
     const navigate = useNavigate()
+    const {startLoading, stopLoading} = useContext(LoadingContext)
 
     /* States for the 7 days */
     const [mondayBegining, setMondayBegining] = useState("")
@@ -118,7 +120,7 @@ export const AddAvailabilities = () => {
     it is pass on the handle submit for every active day*/
     const saveAvailability = async (availability) => {
         try{
-
+            startLoading()
             const res = await api.post("/availability/save", availability)
         }catch(error){
             Swal.fire({
@@ -126,6 +128,8 @@ export const AddAvailabilities = () => {
                 text:error.response?.data?.message || error.response?.data || error.message,
                 icon:"error"
             })
+        }finally{
+            stopLoading()
         }
     }
     /* main function of the page it uploads the form and create the availabilities*/
@@ -142,7 +146,7 @@ export const AddAvailabilities = () => {
                 })
                 return
             }
-            
+            startLoading()
             const savePromises = activeAvailabilities.map((a) => saveAvailability(a))
             
             await Promise.all(savePromises) /* awaits for all the availabilites to be handled before contiue*/
@@ -161,6 +165,8 @@ export const AddAvailabilities = () => {
 
         }catch(error){
             console.error(error)
+        }finally{
+            stopLoading()
         }
         
     }

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 
 export const LoginPage = () => {
   const {user, setUser, token, setToken, login, logOut} = useContext(AuthContext)
+  
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isVisible, setIsVisible] = useState(false)
@@ -34,7 +35,7 @@ export const LoginPage = () => {
     }
    const success = await login(email, password)
    if(success){
-    navigate("/")
+    navigate(-1)
    }
   }
 

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { InputComponent } from '../Component/InputComponent'
 import { useApi } from '../context/AxiosInstance'
 import Swal from 'sweetalert2'
+import { LoadingContext } from '../context/LoadingContext'
 
 export const AmenitiesPage = () => {
 
     const api = useApi()
-
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const [amenities, setAmenities] = useState([])
     const [name, setName] = useState("")
     const [icon, setIcon] = useState(null)
@@ -43,6 +44,7 @@ export const AmenitiesPage = () => {
         })
         if(confirm.isConfirmed){
             try{
+                startLoading()
                 const response = await api.post("/amenity/save",{name, icon},
                     {headers: { "Content-Type": "multipart/form-data" }}
                 )
@@ -54,6 +56,8 @@ export const AmenitiesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -69,6 +73,7 @@ export const AmenitiesPage = () => {
 
         if (confirm.isConfirmed){
             try{
+                startLoading()
                 await api.delete(`/amenity/delete/${amenity.name}`)
                 setAmenities(amenities.filter((a) => a.name != amenity.name))
                  Swal.fire({
@@ -83,6 +88,8 @@ export const AmenitiesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
     }
@@ -90,6 +97,7 @@ export const AmenitiesPage = () => {
     useEffect(() => {
         const getAmenities = async() => {
             try{
+                startLoading()
                 const response = await api.get("/amenity/all")
                 const gettedAmenities = response.data
                 setAmenities(gettedAmenities)
@@ -100,6 +108,8 @@ export const AmenitiesPage = () => {
                     text: error.response?.data?.message || error.response?.data || error.message,
                     icon: "error"
                 });
+            }finally{
+                stopLoading()
             }
         }
         getAmenities()
