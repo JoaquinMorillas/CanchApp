@@ -97,20 +97,23 @@ Refresh token when expired via /auth/refresh
 canchapp/
 ├── backend/
 │   └── src/main/java/...
+        ├── auth/
+│       ├── configuration/
 │       ├── controller/
-│       ├── service/
-│       ├── repository/
-│       ├── model/
 │       ├── dto/
-│       ├── security/
-│       └── config/
+│       ├── entity/
+        ├── exception/
+│       ├── mapper/
+│       ├── repository/
+│       └── service/
 │
 ├── frontend/
 │   └── src/
 │       ├── components/
-│       ├── pages/
+        ├── assets/
 │       ├── context/
-│       └── services/
+│       ├── data/
+│       └── pages/
 │
 └── canchapp_db.sql
 ```
