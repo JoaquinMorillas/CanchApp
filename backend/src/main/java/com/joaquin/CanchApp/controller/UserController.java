@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
 import com.joaquin.CanchApp.dto.UserDTO;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.EmailAlreadyExistsExcepction;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
@@ -70,11 +73,16 @@ public class UserController {
         return ResponseEntity.ok("El usuario con id: " + id + " ha sido eliminado");
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO, @PathVariable Integer id) throws UserIdNotFoundException{
-
-        UserDTO updatedUser = userService.updateUser(userDTO, id);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<UserDTO> updateUser(
+        @RequestBody UserDTO userDTO, 
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User currentUser) throws UserIdNotFoundException{
+           
+            boolean isAdmin = currentUser.getRole()==Role.ADMIN;
+            UserDTO updatedUser = userService.updateUser(userDTO, id, isAdmin);
+            return ResponseEntity.ok(updatedUser);
         
     }
 

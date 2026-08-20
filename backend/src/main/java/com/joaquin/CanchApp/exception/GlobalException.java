@@ -1,9 +1,11 @@
 package com.joaquin.CanchApp.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.http.HttpStatus;
 
 @ControllerAdvice
 public class GlobalException {
@@ -146,4 +148,9 @@ public class GlobalException {
     public ResponseEntity<String> handleReservationDateIsBeforeCurrentDate(ReservationDateIsBeforeCurrentDate ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+        public ResponseEntity<String> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tenés permisos para realizar esta acción");
+}
 }

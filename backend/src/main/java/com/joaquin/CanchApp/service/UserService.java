@@ -101,7 +101,7 @@ public class UserService {
         }
     }
 
-    public UserDTO updateUser(UserDTO userDto, Integer id) throws UserIdNotFoundException{
+    public UserDTO updateUser(UserDTO userDto, Integer id, boolean isAdmin) throws UserIdNotFoundException{
         
         User userToUpdate = userRepository.findById(id)
         .orElseThrow(()-> new UserIdNotFoundException(id));
@@ -109,7 +109,10 @@ public class UserService {
         if (userDto.getName() != null) userToUpdate.setFirstName(userDto.getName());
         if (userDto.getLastName() != null) userToUpdate.setLastName(userDto.getLastName());
         if (userDto.getEmail() != null) userToUpdate.setEmail(userDto.getEmail());
-        if (userDto.getRole() != null) userToUpdate.setRole(userDto.getRole());
+        if (isAdmin){
+
+            if (userDto.getRole() != null) userToUpdate.setRole(userDto.getRole());
+        }
         
         userRepository.save(userToUpdate);
         return UserMapper.toDTO(userToUpdate);

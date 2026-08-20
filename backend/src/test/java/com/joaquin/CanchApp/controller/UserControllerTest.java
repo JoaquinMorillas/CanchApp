@@ -6,18 +6,23 @@ import static org.hamcrest.Matchers.hasSize;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.http.MediaType;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import org.springframework.security.test.context.support.TestExecutionEvent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.joaquin.CanchApp.dto.UserDTO;
@@ -118,5 +123,68 @@ public class UserControllerTest {
                         .andExpect(jsonPath("$.email").value("usuario1@lastname1.com"));
     }
 
+    @Test
+    @WithUserDetails(value = "usuario1@lastname1.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testUpdateUserWithAdmin()throws Exception{
+        String updatedUser = """
+                    {
+                    "name": "test1",
+                    "lastName": "test11",
+                    "email": "test1@test1.com",
+                    "role": "ADMIN"
+                    }
+                """;
+        mockMvc.perform(put("/user/update/" + userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updatedUser)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("test1"))
+            .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
 
+    @Test
+    @WithUserDetails(
+        value = "usuario3@lastname3.com",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION
+    )
+    void testUpdateUserWithUser()throws Exception{
+        String updatedUser = """
+                    {
+                    "name": "test1",
+                    "lastName": "test11",
+                    "email": "test1@test1.com",
+                    "role": "ADMIN"
+                    }
+                """;
+        mockMvc.perform(put("/user/update/" + userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updatedUser)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("test1"))
+            .andExpect(jsonPath("$.role").value("USER"));
+    }
+
+    @Test
+    @WithUserDetails(
+        value = "usuario2@lastname2.com",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void testUpdateUserForbidden()throws Exception{
+        String updatedUser = """
+                    {
+                    "name": "test1",
+                    "lastName": "test11",
+                    "email": "test1@test1.com",
+                    "role": "ADMIN"
+                    }
+                """;
+        mockMvc.perform(put("/user/update/" + userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updatedUser)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
 }
