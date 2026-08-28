@@ -200,7 +200,7 @@ export const AdminReservations = () => {
                                     <tr>
                                         <th scope="col" className='text-center'>Hora de entrada</th>
                                         <th scope="col" className='text-center'>Hora de finalizacion</th>
-                                        <th scope="col" className='text-center'>id de usuario</th>
+                                        <th scope="col" className='text-center'>Nombre de usuario</th>
                                         <th scope="col" className='text-center'>Estado</th>
                                         <th scope="col" className='text-center'>Cancelar Reserva</th>
                                     </tr>
@@ -216,7 +216,7 @@ export const AdminReservations = () => {
                                                     {reservation.finishingHour}
                                                 </td>
                                                 <td className='text-center'>
-                                                    {reservation.userId}
+                                                    {reservation.userName}
                                                 </td>
                                                 <td className='text-center'>
                                                     {reservation.reservationStatus}

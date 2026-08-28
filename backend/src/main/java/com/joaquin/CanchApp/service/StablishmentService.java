@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.joaquin.CanchApp.exception.PolicyIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentNameAlreadyExistsException;
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.mapper.StablishmentMapper;
 import com.joaquin.CanchApp.repository.AmenityRespository;
 import com.joaquin.CanchApp.repository.PolicyRepository;
@@ -58,6 +60,26 @@ public class StablishmentService {
 
         return stablishmentDTOs;
         
+    }
+
+    public List<StablishmentDTO> findAllActive(){
+        List<Stablishment> stablishments = stablishmentRepository.findByIsActiveTrue();
+        List<StablishmentDTO> dtos = new ArrayList<>();
+        dtos = stablishments.stream()
+                .map(StablishmentMapper::toDTO)
+                .collect(Collectors.toList());
+
+        return dtos;
+    }
+
+    public List<StablishmentDTO> findAllNotActive(){
+        List<Stablishment> stablishments = stablishmentRepository.findByIsActiveFalse();
+        List<StablishmentDTO> dtos = new ArrayList<>();
+        dtos = stablishments.stream()
+                .map(StablishmentMapper::toDTO)
+                .collect(Collectors.toList());
+
+        return dtos;
     }
 
     public StablishmentCreationDTO save(@RequestBody StablishmentCreationDTO stablishmentCreationDTO) throws UserIdNotFoundException, AddressAlreadyExistsException, StablishmentNameAlreadyExistsException{
@@ -190,15 +212,28 @@ public class StablishmentService {
         }
     }
 
-    public StablishmentDTO update(StablishmentDTO stablishmentDTO, Integer id) throws StablishmentIdNotFoundException{
-        Optional<Stablishment> searchedStablishment = stablishmentRepository.findById(id);
-        if(!searchedStablishment.isPresent()){
-            throw new StablishmentIdNotFoundException(stablishmentDTO.getId());
-        }else{
+    public StablishmentDTO update(
+        StablishmentDTO stablishmentDTO, 
+        Integer id,
+        User user) throws StablishmentIdNotFoundException, UserIsNotTheOwnerException{
             
-            Stablishment stablishmentToSave = searchedStablishment.get();
+        Stablishment searchedStablishment = stablishmentRepository.findById(id)
+        .orElseThrow(() -> new StablishmentIdNotFoundException(id));
+
+        boolean isAdmin = user.getRole().equals(Role.ADMIN);
+        boolean isOwner = searchedStablishment.getOwner().getId().equals(user.getId());
+        
+        boolean canEdit = isAdmin || isOwner;
+
+        if(!canEdit){
+            throw new UserIsNotTheOwnerException();
+        }
+        
+            
+            Stablishment stablishmentToSave = searchedStablishment;
             
             if(stablishmentDTO.getName() != null){stablishmentToSave.setName(stablishmentDTO.getName());}
+            if(stablishmentDTO.getDescription() != null){stablishmentToSave.setDescription(stablishmentDTO.getDescription());}
             if(stablishmentDTO.getCity() != null){stablishmentToSave.getAddress().setCity(stablishmentDTO.getCity());}
             if(stablishmentDTO.getStreet() != null){stablishmentToSave.getAddress().setStreet(stablishmentDTO.getStreet());}
             if(stablishmentDTO.getNumber() != null){stablishmentToSave.getAddress().setNumber(stablishmentDTO.getNumber());}
@@ -222,4 +257,4 @@ public class StablishmentService {
         }
 
     }
-}
+

@@ -8,7 +8,8 @@ public class ReservationMapper {
     public static ReservationDTO toDTO(Reservation reservation){
         return ReservationDTO.builder()
         .id(reservation.getId())
-        .userId(reservation.getUser() == null ? null : reservation.getUser().getId())
+        .userId(reservation.getId() == null ? null : reservation.getUser().getId())
+        .userName(reservation.getUser() == null ? null : reservation.getUser().getFirstName() + " "  + reservation.getUser().getLastName())
         .stablishmentId(reservation.getSportField().getStablishment().getId())
         .SportFieldId(reservation.getSportField().getId())
         .reservationDate(reservation.getReservationDate())

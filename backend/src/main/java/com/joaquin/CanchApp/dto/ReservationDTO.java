@@ -15,6 +15,7 @@ public class ReservationDTO {
 
     private Integer id;
     private Integer userId;
+    private String userName;
     private Integer stablishmentId;
     private Integer SportFieldId;
     private String stablishmentName;

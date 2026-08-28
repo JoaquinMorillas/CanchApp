@@ -152,5 +152,10 @@ public class GlobalException {
     @ExceptionHandler(AuthorizationDeniedException.class)
         public ResponseEntity<String> handleAuthorizationDenied(AuthorizationDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-}
+    }
+
+    @ExceptionHandler(UserIsNotTheOwnerException.class)
+    public ResponseEntity<String> handleUserIsNotTheOwnerException(UserIsNotTheOwnerException ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

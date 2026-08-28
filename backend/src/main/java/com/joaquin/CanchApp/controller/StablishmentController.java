@@ -24,6 +24,7 @@ import com.joaquin.CanchApp.exception.AddressAlreadyExistsException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentNameAlreadyExistsException;
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.service.StablishmentService;
 
 @RestController
@@ -103,8 +104,11 @@ public class StablishmentController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<StablishmentDTO> updateStablishment(@RequestBody StablishmentDTO dto, @PathVariable Integer id) throws StablishmentIdNotFoundException{
-        StablishmentDTO updateDto = stablishmentService.update(dto, id);
+    public ResponseEntity<StablishmentDTO> updateStablishment(
+        @RequestBody StablishmentDTO dto, 
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User user) throws StablishmentIdNotFoundException, UserIsNotTheOwnerException{
+        StablishmentDTO updateDto = stablishmentService.update(dto, id, user);
         return ResponseEntity.ok(updateDto);
     }
 }
