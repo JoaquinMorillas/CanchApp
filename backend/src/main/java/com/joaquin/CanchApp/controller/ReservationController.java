@@ -51,14 +51,7 @@ public class ReservationController {
         List<ReservationDTO> dtos = reservationService.findBySportFieldIdAndDate(id, date);
         return ResponseEntity.ok(dtos);
     }
-    /*Deprecated now it is used confirmReservation
-     * 
-     @PostMapping("/save")
-     public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws UserIdNotFoundException, SportFieldIdNotFoundException, StablishmentIdNotFoundException, DurationLenghtDifferentFromExpected, ReservationBeginingHourNotAvailableException{
-         ReservationDTO reservationDTO = reservationService.saveReservation(dto);
-         return ResponseEntity.ok(reservationDTO);
-     }
-     */
+    
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PostMapping("/generate-slots")

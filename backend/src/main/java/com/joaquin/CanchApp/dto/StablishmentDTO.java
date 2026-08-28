@@ -24,6 +24,9 @@ public class StablishmentDTO {
     private String description;
     private String telephoneNumber;
 
+    
+    private boolean isActive;
+
     private List<Sport> sports;
 
     private List<String> sportFieldsNames;

@@ -5,5 +5,8 @@
   --bs-dark: #1D1E2C;       /* Charcoal Dark */
   --bs-light: #F0F1F6;      /* Off-White / Soft Light */
   --bs-border-color: #D3D3E2; /* Light Grayish Blue */
-
+  .custom-row {
+      --bs-table-bg: #d45454; /* Purple background */
+      --bs-table-color: #ffffff; /* White text */
+    }
 }

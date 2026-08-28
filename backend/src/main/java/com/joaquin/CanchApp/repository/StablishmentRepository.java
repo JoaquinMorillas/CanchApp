@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.joaquin.CanchApp.entity.Stablishment;
@@ -15,12 +18,17 @@ import com.joaquin.CanchApp.entity.Sport;
 public interface StablishmentRepository extends JpaRepository<Stablishment, Integer>{
 
     
-    List<Stablishment> findByAddressCityContainingIgnoreCase(String city);
+    List<Stablishment> findByAddressCityContainingIgnoreCaseAndIsActiveTrue(String city);
     
-    Optional<Stablishment> findByName(String name);
+    Optional<Stablishment> findByNameAndIsActiveTrue(String name);
 
-    List<Stablishment> findByOwnerId(Integer id);
+    List<Stablishment> findByOwnerIdAndIsActiveTrue(Integer id);
 
-    List<Stablishment> findBySportFieldsSport(Sport sport);
+    List<Stablishment> findBySportFieldsSportAndIsActiveTrue(Sport sport);
+
+    List<Stablishment> findByIsActiveTrue();
+
+    List<Stablishment> findByIsActiveFalse();
+
 
 }

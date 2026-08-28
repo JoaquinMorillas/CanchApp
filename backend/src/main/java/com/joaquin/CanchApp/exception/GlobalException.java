@@ -151,6 +151,6 @@ public class GlobalException {
 
     @ExceptionHandler(AuthorizationDeniedException.class)
         public ResponseEntity<String> handleAuthorizationDenied(AuthorizationDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tenés permisos para realizar esta acción");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
 }
 }

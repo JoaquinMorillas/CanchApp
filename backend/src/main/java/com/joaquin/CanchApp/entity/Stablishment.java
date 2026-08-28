@@ -41,6 +41,9 @@ public class Stablishment {
 
     private String description;
     private String telephoneNumber;
+    
+    @Builder.Default
+    private boolean isActive = false;
 
     @ElementCollection
     @CollectionTable(

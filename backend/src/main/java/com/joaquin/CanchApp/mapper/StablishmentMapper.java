@@ -10,6 +10,7 @@ public class StablishmentMapper {
     public static StablishmentDTO toDTO(Stablishment stablishment){
         return StablishmentDTO.builder()
         .id(stablishment.getId())
+        .isActive(stablishment.isActive())
         .name(stablishment.getName())
         .images(stablishment.getImages())
         .description(stablishment.getDescription())

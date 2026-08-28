@@ -7,7 +7,7 @@ import { sportsInfo } from '../data/sportsInfo'
 import { OpinionComponent } from '../Component/OpinionComponent'
 import Swal from 'sweetalert2'
 import withReactContent from "sweetalert2-react-content";
-
+import { NotFoundPage } from './NotFoundPage'
 import { LeftArrowComponent } from '../Component/LeftArrowComponent'
 import { AuthContext } from '../context/AuthContext'
 import { LoadingContext } from '../context/LoadingContext'
@@ -209,6 +209,8 @@ export const StablishmentInfo = () => {
         }
     },[stablishment, street, number, city])
   return ( 
+    stablishment?.active ? (
+
     <>  
     <WhatsappButtonComponent telephoneNumber={telephoneNumber} userName={user?.firstName} stablishmentName={name}/>
     <div style={{maxWidth:"95%", margin:"0 auto", backgroundColor:"var(--bs-light)"}}>
@@ -435,5 +437,6 @@ export const StablishmentInfo = () => {
         </div>
     </div>
     </>
+    ): (<NotFoundPage />)
   )
 }

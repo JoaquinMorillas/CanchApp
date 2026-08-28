@@ -118,7 +118,7 @@ export const StablishmentProvider = ({ children }) => {
     }
 
     const deleteStablishment = async (id) =>{
-        const res = await api.delete("/stablishment/" + id)
+        const res = await api.put("/stablishment/delete/" + id)
         const action = {
             type: "Delete",
             payload: id

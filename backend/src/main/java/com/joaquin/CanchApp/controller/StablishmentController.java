@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.joaquin.CanchApp.dto.StablishmentCreationDTO;
 import com.joaquin.CanchApp.dto.StablishmentDTO;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.Sport;
-
+import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.AddressAlreadyExistsException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentNameAlreadyExistsException;
@@ -61,11 +63,26 @@ public class StablishmentController {
         return ResponseEntity.ok(stablishmentDTOs);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Integer id) throws StablishmentIdNotFoundException{
-        stablishmentService.deleteById(id);
-        return ResponseEntity.ok().body("The stablishment with id: " + id + " has been deleted");
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("delete/{id}")
+    public ResponseEntity<String> deleteById(
+        @PathVariable Integer id, 
+        @AuthenticationPrincipal User user) throws StablishmentIdNotFoundException, UserIdNotFoundException{
+            
+            
+            stablishmentService.deleteById(id, user);
+            return ResponseEntity.ok().body("The stablishment with id: " + id + " has been deleted");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("activate/{id}")
+    public ResponseEntity<String> activateById(
+        @PathVariable Integer id, 
+        @AuthenticationPrincipal User user) throws StablishmentIdNotFoundException, UserIdNotFoundException{
+            
+            
+            stablishmentService.activateStablishmentById(id, user);
+            return ResponseEntity.ok().body("The stablishment with id: " + id + " has been activated");
     }
 
     @GetMapping("sport/{sport}")

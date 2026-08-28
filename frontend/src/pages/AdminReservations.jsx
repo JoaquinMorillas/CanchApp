@@ -19,7 +19,7 @@ export const AdminReservations = () => {
     const [selectedStablishment, setSelectedStablishment] = useState(null)
     const [selectedSportFields, setSelectedSportFields] = useState([])
     const [selectedReservations, setSelectedReservations] = useState({})
-
+    const [selectedSlots, setSelectedSlots] = useState({})
 
     const getRowClass = (status) => {
         switch (status) {
@@ -115,11 +115,12 @@ export const AdminReservations = () => {
                 const results = await Promise.all(
                     selectedSportFields.map(async (sportField) => {
                         const response = await api.get(`/reservation/sport-field/${sportField.id}?date=${date}`)
-                        
+                        const freeSlots = await api.get(`/reservation/sport-field/${sportField.id}/slots?date=${date}`)
 
                         return {
                             sportFieldId: sportField.id,
-                            reservations: response.data
+                            reservations: response.data,
+                            slots: freeSlots.data.filter((s)=> s.available == true)
                         }
                     }
                 
@@ -131,7 +132,13 @@ export const AdminReservations = () => {
                     reservationMap[r.sportFieldId] = r.reservations
                 })
 
+                const slotsMap = {}
+                results.forEach(r => {
+                    slotsMap[r.sportFieldId] = r.slots
+                })
+
                 setSelectedReservations(reservationMap)
+                setSelectedSlots(slotsMap)
 
             }catch(error){
                 console.error(error)
@@ -175,7 +182,7 @@ export const AdminReservations = () => {
                 </h5>
                 {selectedSportFields?.length > 0 && selectedSportFields.map((sportField) =>{
                     const reservations = selectedReservations[sportField.id] || []
-                    
+                    const slots = selectedSlots[sportField.id] || []
                     return(
                         <div key={sportField.id} className="mb-4">
                             <h5>{sportField.name}</h5>
@@ -183,56 +190,95 @@ export const AdminReservations = () => {
                             {reservations.length === 0 ? (
                                 <p>No hay reservas todavia</p>
                             ) : (
-                                <table className="table table-striped table-hover">
-                                <thead style={{ position: 'sticky',
-                                top: 55,
-                                zIndex: 2,
-                                backgroundColor: 'var(--bs-light)', }}>
-                                <tr>
-                                    <th scope="col" className='text-center'>Hora de entrada</th>
-                                    <th scope="col" className='text-center'>Hora de finalizacion</th>
-                                    <th scope="col" className='text-center'>id de usuario</th>
-                                    <th scope="col" className='text-center'>Estado</th>
-                                    <th scope="col" className='text-center'>Cancelar Reserva</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    {reservations.map((reservation) => (
-                                        <tr key={reservation.id}
-                                        className={getRowClass(reservation.reservationStatus)}>
-                                            <td className='text-center'>
-                                                {reservation.beginingHour}
-                                            </td>
-                                             <td className='text-center'>
-                                                {reservation.finishingHour}
-                                            </td>
-                                             <td className='text-center'>
-                                                {reservation.userId}
-                                            </td>
-                                            <td className='text-center'>
-                                                {reservation.reservationStatus}
-                                            </td>
-                                            <td className='text-center'>
-                                                {reservation.reservationStatus=="CONFIRMED" && (
+                                <>
+                                    <h3>Reservas</h3>
+                                    <table className="table table-striped table-hover">
+                                    <thead style={{ position: 'sticky',
+                                    top: 55,
+                                    zIndex: 2,
+                                    backgroundColor: 'var(--bs-light)', }}>
+                                    <tr>
+                                        <th scope="col" className='text-center'>Hora de entrada</th>
+                                        <th scope="col" className='text-center'>Hora de finalizacion</th>
+                                        <th scope="col" className='text-center'>id de usuario</th>
+                                        <th scope="col" className='text-center'>Estado</th>
+                                        <th scope="col" className='text-center'>Cancelar Reserva</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reservations.map((reservation) => (
+                                            <tr key={reservation.id}
+                                            className={getRowClass(reservation.reservationStatus)}>
+                                                <td className='text-center'>
+                                                    {reservation.beginingHour}
+                                                </td>
+                                                <td className='text-center'>
+                                                    {reservation.finishingHour}
+                                                </td>
+                                                <td className='text-center'>
+                                                    {reservation.userId}
+                                                </td>
+                                                <td className='text-center'>
+                                                    {reservation.reservationStatus}
+                                                </td>
+                                                <td className='text-center'>
+                                                    {reservation.reservationStatus=="CONFIRMED" && (
 
-                                                <button className='btn btn-danger'
-                                                onClick={() => handleCancelReservation(reservation)}>Cancelar Reserva</button>
-                                                )}
-                                            </td>
-                                        </tr>
+                                                    <button className='btn btn-danger'
+                                                    onClick={() => handleCancelReservation(reservation)}>Cancelar Reserva</button>
+                                                    )}
+                                                </td>
+                                            </tr>
 
-                                    ))}
-                                    
-                                </tbody>
-                                </table>
+                                        ))}
+                                        
+                                    </tbody>
+                                    </table>
+                                </>
                             )}
-                         </div>   
+                            {slots?.length === 0 ? (
+                                <p>No hay turnos libres</p>
+                            ) : (
+                                <>
+                                    <h3>Turnos libres</h3>
+                                    <table className="table table-striped table-hover">
+                                    <thead style={{ position: 'sticky',
+                                    top: 55,
+                                    zIndex: 2,
+                                    backgroundColor: 'var(--bs-light)', }}>
+                                    <tr>
+                                        <th scope="col" className='text-center'>Hora de entrada</th>
+                                        <th scope="col" className='text-center'>Hora de finalizacion</th>
+                                        
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {slots.map((slot) => (
+                                            <tr key={slot.id}>
+                                                <td className='text-center'>
+                                                    {slot.startTime}
+                                                </td>
+                                                <td className='text-center'>
+                                                    {slot.finishTime}
+                                                </td>
+                                                
+                                            </tr>
+
+                                        ))}
+                                        
+                                    </tbody>
+                                    </table>
+                                </>
+                            )}
+                         
+                         </div>
+                            
                     )}
                 )}
             </div>
         )}
     </div>
-
+    
     </>
   )
 }

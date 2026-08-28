@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -15,6 +16,7 @@ import com.joaquin.CanchApp.dto.StablishmentDTO;
 import com.joaquin.CanchApp.entity.Address;
 import com.joaquin.CanchApp.entity.Amenity;
 import com.joaquin.CanchApp.entity.Policy;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.Sport;
 import com.joaquin.CanchApp.entity.Stablishment;
 import com.joaquin.CanchApp.entity.User;
@@ -28,6 +30,9 @@ import com.joaquin.CanchApp.repository.AmenityRespository;
 import com.joaquin.CanchApp.repository.PolicyRepository;
 import com.joaquin.CanchApp.repository.StablishmentRepository;
 import com.joaquin.CanchApp.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.joaquin.CanchApp.mapper.StablishmentCreationMapper;
 
 @Service
@@ -57,7 +62,7 @@ public class StablishmentService {
 
     public StablishmentCreationDTO save(@RequestBody StablishmentCreationDTO stablishmentCreationDTO) throws UserIdNotFoundException, AddressAlreadyExistsException, StablishmentNameAlreadyExistsException{
 
-        Optional<Stablishment> nameCheck = stablishmentRepository.findByName(stablishmentCreationDTO.getName());
+        Optional<Stablishment> nameCheck = stablishmentRepository.findByNameAndIsActiveTrue(stablishmentCreationDTO.getName());
         if(nameCheck.isPresent()){
             throw new StablishmentNameAlreadyExistsException(nameCheck.get().getName());
         }
@@ -101,7 +106,7 @@ public class StablishmentService {
                 .build();
 
             Stablishment savedStablishment = stablishmentRepository.save(stablishment);
-            System.out.println("Saving Stablishment with images: " + stablishment.getImages());
+            //System.out.println("Saving Stablishment with images: " + stablishment.getImages());
             return StablishmentCreationMapper.toDTO(savedStablishment);
             
         }
@@ -118,21 +123,37 @@ public class StablishmentService {
     }
 
     public List<StablishmentDTO> findByCity(String city){
-        List<Stablishment> stablishments = stablishmentRepository.findByAddressCityContainingIgnoreCase(city);
+        List<Stablishment> stablishments = stablishmentRepository.findByAddressCityContainingIgnoreCaseAndIsActiveTrue(city);
         List<StablishmentDTO> stablishmentDTOs = stablishments.stream()
                                                 .map(StablishmentMapper::toDTO)
                                                 .collect(Collectors.toList());
         return stablishmentDTOs;
                                             
     }
+    //only an admin can softdelete a stablishment
+    @Transactional
+    public void deleteById(Integer id, User user) throws StablishmentIdNotFoundException{
+       
+      boolean isAdmin = user.getRole()==Role.ADMIN;
+      Stablishment stablishment = stablishmentRepository.findById(id)
+      .orElseThrow( () -> new StablishmentIdNotFoundException(id));
 
-    public void deleteById(Integer id) throws StablishmentIdNotFoundException{
-        Optional<Stablishment> stablishment = stablishmentRepository.findById(id);
-        if(!stablishment.isPresent()){
-            throw new StablishmentIdNotFoundException(id);
-        }else{
-            stablishmentRepository.deleteById(id);
-        }
+      if(isAdmin){
+        stablishment.setActive(false);
+        stablishmentRepository.save(stablishment);
+      }   
+      
+    }
+
+    public void activateStablishmentById(Integer id, User user) throws StablishmentIdNotFoundException{
+        boolean isAdmin = user.getRole()==Role.ADMIN;
+      Stablishment stablishment = stablishmentRepository.findById(id)
+      .orElseThrow( () -> new StablishmentIdNotFoundException(id));
+
+      if(isAdmin){
+        stablishment.setActive(true);
+        stablishmentRepository.save(stablishment);
+      }   
     }
 
     public List<StablishmentDTO> findByOwnerID(Integer id) throws UserIdNotFoundException{
@@ -141,7 +162,7 @@ public class StablishmentService {
             throw new UserIdNotFoundException(id);
         }else{
 
-            List<Stablishment> stablishments = stablishmentRepository.findByOwnerId(id);
+            List<Stablishment> stablishments = stablishmentRepository.findByOwnerIdAndIsActiveTrue(id);
             
             List<StablishmentDTO> stablishmentDTOs = stablishments.stream()
                 .map(StablishmentMapper::toDTO)
@@ -151,7 +172,7 @@ public class StablishmentService {
     }
 
     public List<StablishmentDTO> findBySport(Sport sport){
-        List<Stablishment> stablishments = stablishmentRepository.findBySportFieldsSport(sport);
+        List<Stablishment> stablishments = stablishmentRepository.findBySportFieldsSportAndIsActiveTrue(sport);
 
         List<StablishmentDTO> dtos = stablishments.stream()
         .map(StablishmentMapper::toDTO)
@@ -161,7 +182,7 @@ public class StablishmentService {
     }
 
     public Boolean findByName(String name) {
-        Optional<Stablishment> searchedStablishment = stablishmentRepository.findByName(name);
+        Optional<Stablishment> searchedStablishment = stablishmentRepository.findByNameAndIsActiveTrue(name);
         if (searchedStablishment.isPresent()) {
             return true;
         } else {
