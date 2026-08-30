@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +21,12 @@ import com.joaquin.CanchApp.dto.SportFieldDTO;
 import com.joaquin.CanchApp.dto.SportFieldUpdateDTO;
 import com.joaquin.CanchApp.entity.Sport;
 import com.joaquin.CanchApp.entity.SportField;
+import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 import com.joaquin.CanchApp.exception.SportFieldNameAlreadyExistsException;
 import com.joaquin.CanchApp.exception.SportNameNotFoundException;
 import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.service.SportFieldService;
 
 
@@ -36,8 +39,10 @@ public class SportFieldController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PostMapping("/save")
-    public ResponseEntity<SportFieldDTO> save(@RequestBody SportFieldDTO sportFieldCreationDTO) throws SportFieldNameAlreadyExistsException, SportNameNotFoundException{
-        SportFieldDTO savedSportFieldCreationDTO = sportFieldService.save(sportFieldCreationDTO);
+    public ResponseEntity<SportFieldDTO> save(
+        @RequestBody SportFieldDTO sportFieldCreationDTO,
+        @AuthenticationPrincipal User user) throws SportFieldNameAlreadyExistsException, SportNameNotFoundException, StablishmentIdNotFoundException, UserIsNotTheOwnerException{
+        SportFieldDTO savedSportFieldCreationDTO = sportFieldService.save(sportFieldCreationDTO, user);
         return ResponseEntity.ok(savedSportFieldCreationDTO);
     }
 
@@ -47,9 +52,10 @@ public class SportFieldController {
         return ResponseEntity.ok(sportFieldCreationDTOs);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_complete")
-    public ResponseEntity<List<SportField>> findAllComplete(){
-        List<SportField> sportFields = sportFieldService.findAllComplete();
+    public ResponseEntity<List<SportFieldDTO>> findAllComplete(){
+        List<SportFieldDTO> sportFields = sportFieldService.findAllComplete();
         return ResponseEntity.ok(sportFields);
     }
 
@@ -87,16 +93,30 @@ public class SportFieldController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     @PutMapping("update/{id}")
-    public ResponseEntity<SportFieldUpdateDTO> update(@PathVariable Integer id, @RequestBody SportFieldUpdateDTO sportFieldUpdateDTO) throws SportFieldIdNotFoundException{
-        SportFieldUpdateDTO UpdateDTO = sportFieldService.update(sportFieldUpdateDTO, id);
+    public ResponseEntity<SportFieldUpdateDTO> update(
+        @PathVariable Integer id, 
+        @RequestBody SportFieldUpdateDTO sportFieldUpdateDTO,
+        @AuthenticationPrincipal User user) throws SportFieldIdNotFoundException, UserIsNotTheOwnerException{
+        SportFieldUpdateDTO UpdateDTO = sportFieldService.update(sportFieldUpdateDTO, id, user);
          return ResponseEntity.ok(UpdateDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Integer id) throws SportFieldIdNotFoundException{
-        sportFieldService.deleteById(id);
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<String> deleteById(
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User user) throws SportFieldIdNotFoundException, UserIsNotTheOwnerException{
+        sportFieldService.deleteById(id, user);
         return ResponseEntity.ok("The sportField with id: " + id + " has been deleted");
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<String> restoreById(
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User user) throws SportFieldIdNotFoundException, UserIsNotTheOwnerException{
+        sportFieldService.restoreById(id, user);
+        return ResponseEntity.ok("The sportField with id: " + id + " has been restored");
     }
 
     @GetMapping("/stablishment_id/{id}/{name}")

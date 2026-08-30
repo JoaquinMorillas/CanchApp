@@ -10,6 +10,7 @@ public class SportFieldMapper {
         .id(sportField.getId())
         .name(sportField.getName())
         .stablishmentId(sportField.getStablishment().getId())
+        .isActive(sportField.isActive())
         .price(sportField.getPrice())
         .reservationDuration(sportField.getReservationDuration())
         .sportName(sportField.getSport().getName())

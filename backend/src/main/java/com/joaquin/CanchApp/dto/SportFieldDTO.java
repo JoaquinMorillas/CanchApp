@@ -17,6 +17,7 @@ public class SportFieldDTO {
     private Duration reservationDuration;
     private String sportCategory;
     private String sportName;
+    private boolean isActive;
 
     
 }

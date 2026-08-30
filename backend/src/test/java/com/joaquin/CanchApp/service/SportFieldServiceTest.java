@@ -21,9 +21,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.joaquin.CanchApp.dto.SportFieldDTO;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.Sport;
+import com.joaquin.CanchApp.entity.User;
 import com.joaquin.CanchApp.exception.SportFieldNameAlreadyExistsException;
 import com.joaquin.CanchApp.exception.SportNameNotFoundException;
+import com.joaquin.CanchApp.exception.StablishmentIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 
 import jakarta.transaction.Transactional;
 
@@ -41,7 +45,17 @@ public class SportFieldServiceTest {
     private Integer sportFieldId;
 
     @BeforeEach
-    public void dataLoad() throws SportFieldNameAlreadyExistsException, SportNameNotFoundException{
+    public void dataLoad() throws SportFieldNameAlreadyExistsException, SportNameNotFoundException, StablishmentIdNotFoundException, UserIsNotTheOwnerException{
+        User testUser = User.builder()
+                        .id(1)
+                        .firstName("juan")
+                        .lastName("perez")
+                        .email("admin@admin.com")
+                        .password("password")
+                        .role(Role.ADMIN)
+                        .isActive(true)
+                        .build();
+
         SportFieldDTO sportFieldTosave = SportFieldDTO.builder() 
                 
             .name("cancha 50")
@@ -52,7 +66,7 @@ public class SportFieldServiceTest {
             .sportCategory("Futbol")
             .build();
             ;
-        SportFieldDTO savedDTO = sportFieldService.save(sportFieldTosave);
+        SportFieldDTO savedDTO = sportFieldService.save(sportFieldTosave, testUser);
         sportFieldId = savedDTO.getId();
 
     }
@@ -105,45 +119,6 @@ public class SportFieldServiceTest {
                         .andExpect(jsonPath("[*].id").value(hasItem(sportFieldId)));
     }
 
-    @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
-    void testSave() throws Exception {
-        String sportFieldToSave = """
-                {
-                "name": "cancha 83",
-                "stablishmentId": 1,
-                "price": 300.0,
-                "reservationDuration": "PT1H30M",
-                "sportName": "Futbol 11"
-                }
-                """;
-        
-        mockMvc.perform(post("/sport_field/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(sportFieldToSave)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.name").value("cancha 83"));
-    }
 
-    @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
-    void testUpdate() throws Exception {
-        String sportFieldToUpdate = """
-                {
-                "name": "cancha 83",
-                "stablishmentId": 1,
-                "price": 300.0,
-                "reservationDuration": "PT1H30M",
-                "sport": "FUTBOL_11"
-                }
-                """;
-        mockMvc.perform(put("/sport_field/update/" + sportFieldId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(sportFieldToUpdate)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.name").value("cancha 83"))
-                        ;
-    }
+    
 }

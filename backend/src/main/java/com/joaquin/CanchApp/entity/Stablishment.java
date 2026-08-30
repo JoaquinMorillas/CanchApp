@@ -43,7 +43,7 @@ public class Stablishment {
     private String telephoneNumber;
     
     @Builder.Default
-    private boolean isActive = false;
+    private boolean isActive = true;
 
     @ElementCollection
     @CollectionTable(

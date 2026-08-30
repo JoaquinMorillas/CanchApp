@@ -13,17 +13,19 @@ import java.util.List;
 @Repository
 public interface SportFieldRepository extends JpaRepository<SportField, Integer>{
 
-    Optional<SportField> findByName(String name);
+    Optional<SportField> findByNameAndIsActiveTrue(String name);
 
-    Optional<SportField> findByStablishmentIdAndName(Integer stablishmentId, String name);
+    Optional<SportField> findByStablishmentIdAndNameAndIsActiveTrue(Integer stablishmentId, String name);
 
-    List<SportField> findByStablishmentAddressCityContainingIgnoreCase(String city);
+    List<SportField> findByIsActiveTrue();
+    
+    List<SportField> findByStablishmentAddressCityContainingIgnoreCaseAndIsActiveTrue(String city);
 
-    List<SportField> findBySportNameAndStablishmentAddressCityContainingIgnoreCase(String sport, String city);
+    List<SportField> findBySportNameAndStablishmentAddressCityContainingIgnoreCaseAndIsActiveTrue(String sport, String city);
 
-    List<SportField> findBySportName(String name);
+    List<SportField> findBySportNameAndIsActiveTrue(String name);
 
-    List<SportField> findByStablishmentId(Integer id);
+    List<SportField> findByStablishmentIdAndIsActiveTrue(Integer id);
 
-    List<SportField> findByStablishmentIdAndSportName(Integer id, String sport);
+    List<SportField> findByStablishmentIdAndSportNameAndIsActiveTrue(Integer id, String sport);
 }

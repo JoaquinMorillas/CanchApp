@@ -112,7 +112,7 @@ export const EditStablishment = () => {
         if(confirmed.isConfirmed){
             try{
                 startLoading()
-                await api.delete(`/sport_field/delete/${sportField.id}`)
+                await api.put(`/sport_field/delete/${sportField.id}`)
                 const updatedSportsFields = sportFields.filter((s) => s.id != sportField.id)
                 setSportFields(updatedSportsFields)
             }catch(error){

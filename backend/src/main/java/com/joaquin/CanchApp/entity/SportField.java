@@ -5,8 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +33,8 @@ public class SportField {
     private String name;
     private Double price;
     private Duration reservationDuration;
-
+    @Builder.Default
+    private boolean isActive = true;
     
 
 
