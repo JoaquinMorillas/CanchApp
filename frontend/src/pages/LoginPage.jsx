@@ -4,6 +4,21 @@ import { InputComponent } from '../Component/InputComponent'
 import {useApi} from '../context/AxiosInstance'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
+import { useFormValidations } from '../hooks/useFormValidations'
+import { FormFieldComponent } from '../Component/FormFieldComponent'
+
+const validators = {
+  email: (v) => {
+    if(!v) return "El correo electrónico es obligatorio"
+    if(!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))) return "El correo electrónico no es valido"
+    return ""
+  },
+  password: (v) => {
+    if(!v) return "La contraseña es obligatoria"
+    return ""
+  }
+
+}
 
 export const LoginPage = () => {
   const {user, setUser, token, setToken, login, logOut} = useContext(AuthContext)
@@ -13,6 +28,7 @@ export const LoginPage = () => {
   const [isVisible, setIsVisible] = useState(false)
   const api = useApi()
   const navigate = useNavigate()
+  const {errors, handleBlur} = useFormValidations(validators)
 
   const handleLogIn = async() => {
     if(!email){
@@ -54,13 +70,27 @@ export const LoginPage = () => {
         <div className='container'>
           <div className='row'>
             <div className='col-8'>
-
-              <InputComponent label="correo electronico" type="text" value={email} setValue={setEmail}/>
+              <FormFieldComponent 
+              label="Correo Electronico"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onBlur={() => handleBlur("email", email)}
+              error={errors.email}
+              />
+              
             </div>
             <div className='row'>
 
               <div className='col-8'>
-                <InputComponent label="constraseña" type={isVisible ? "text" : "password"} value={password} setValue={setPassword}/>
+                <FormFieldComponent 
+                label="Contraseña"
+                type={isVisible ? "text" : "password"}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                error={errors.password}
+                onBlur={() => handleBlur("password", password)}
+                />
+                
 
               </div>
               <div className='col-4'>

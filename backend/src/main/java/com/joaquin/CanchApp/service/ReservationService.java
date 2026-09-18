@@ -201,6 +201,7 @@ public class ReservationService {
                 if (currentDate.isBefore(LocalDate.now())) {
                     continue;
                 }
+                
 
                 //If specialDate
                 AvailabilityDTO availabilityForDate = availabilityService.findBySportFieldIdAndSpecificDate(sportFieldId, currentDate);
@@ -213,7 +214,11 @@ public class ReservationService {
                     .orElse(null);
                 }
 
-                if (availabilityForDate == null){
+                if (availabilityForDate == null
+                    || !availabilityForDate.isActive()
+                    || availabilityForDate.getBeginingTime() == null
+                    || availabilityForDate.getEndingTime() == null
+                ){
                     continue;
                 }
 
@@ -221,7 +226,7 @@ public class ReservationService {
                 LocalTime end = availabilityForDate.getEndingTime();
 
                 while (begin.plus(duration).isBefore(end) || begin.plus(duration).equals(end))  {
-                    if(begin.plus(duration) == LocalTime.MIDNIGHT || begin.isBefore(availabilityForDate.getBeginingTime())){
+                    if(begin.plus(duration).equals(LocalTime.MIDNIGHT ) || begin.isBefore(availabilityForDate.getBeginingTime())){
                         break;
                     }
                     Slot slot = Slot.builder()

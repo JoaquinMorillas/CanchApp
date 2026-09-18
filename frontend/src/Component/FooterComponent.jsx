@@ -8,7 +8,7 @@ export const FooterComponent = () => {
         color: "var(--bs-light)",
         zIndex : "-100"}}>
         <div class="container-fluid d-flex justify-content-between align-items-center text-white">
-            <span>©2025 CanchApp</span>
+            <span>©{new Date().getFullYear()} CanchApp</span>
             <div className='d-flex gap-3'>
                 <a className="navbar-brand" href="#">
                     <img src="/icons8-instagram-32.png" alt="Instagram" />

@@ -42,6 +42,34 @@ export const EditStablishment = () => {
 
     /* main function, saves the changes and navigate back to administation panel */
     const saveChanges = async () =>{
+        if(!name){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere un nombre",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+        if(!street){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere una calle",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+        if(!number){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere un número",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+                
         try{
             startLoading()
             const uploadForm = new FormData();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useApi } from '../context/AxiosInstance'
 import { InputComponent } from '../Component/InputComponent'
 import Swal from 'sweetalert2'
@@ -35,6 +35,33 @@ export const EditSportsPage = () => {
 
 
     const handleSaveSport = async () => {
+        if(!name){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere un nombre",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+        if(!category){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere una categoria",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+        if(!icon){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere un icono",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
         const confirm = await Swal.fire({
             title:"Atencion",
             text: `¿Estas seguro de querer guardar el deporte ${name}?`,
@@ -124,7 +151,25 @@ export const EditSportsPage = () => {
     }
 
     const handleEdit = async (sport) => {
-       
+       if(!editName){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere un nombre",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+        if(!editCategory){
+            Swal.fire({
+                title:"Error",
+                text:"Se requiere una categoria",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+        }
+            
         const confirm = await Swal.fire({
             title:"Atencion",
             text: `¿Estas seguro de querer Editar el deporte "${sport.name}"?`,

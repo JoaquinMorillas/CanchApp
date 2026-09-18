@@ -3,10 +3,33 @@ import { useApi } from '../../context/AxiosInstance'
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { NavLink } from 'react-router-dom'
+import { FormFieldComponent } from '../../Component/FormFieldComponent'
+import { useFormValidations } from '../../hooks/useFormValidations'
 
+const validators = {
+  ownerId: (v) => {
+    if(!v) return "El id del dueño es obligatorio"
+    if(Number(v) <= 0) return "El número debe ser positivo"
+    return ""
+  },
+  name: (v) => {
+    if(!v || v.trim().length === 0) return "El nombre es obligatorio"
+    return ""
+  },
+  telephoneNumber: (v) => {
+    if (!v) return 'El teléfono es obligatorio'
+    if (!/^\d{8,15}$/.test(v)) return 'Ingresá solo números, entre 8 y 15 dígitos'
+    return ''
+  },
+  description: (v) => {
+    if (!v || v.trim().length < 30) return 'La descripción es obligatoria y debe tener al menos 30 caracteres'
+    return ''
+  }
+}
 export const Step1 = ({ formData, setFormData, onNext}) => {
     
     const api = useApi()
+    const { errors, handleBlur, validateAll } = useFormValidations(validators)
     const [amenities, setAmenities] = useState([])
     const [selectedAmenities , setSelectedAmenities] = useState([])
 
@@ -89,76 +112,46 @@ export const Step1 = ({ formData, setFormData, onNext}) => {
       <h4 className="mb-4">PASO 1:</h4>
       <h5 className="mb-4">Datos del Establecimiento</h5>
         {/* Owner id input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Id de Dueño: 
-            </label>
-          
-            <input 
-            type="number" 
-            class="form-control"
-            value={formData.ownerId}
-            onChange={(e) => setFormData({ ...formData, ownerId: e.target.value })} 
-            placeholder='Ej: 1'
-            style={{ maxWidth: "250px" }}/>
-          
-        </div>
+        <FormFieldComponent
+          label="Id del dueño"
+          type="number"
+          value={formData.ownerId}
+          onChange={e => setFormData({...formData, ownerId: e.target.value})}
+          onBlur={() => handleBlur("ownerId", formData.ownerId)}
+          placeholder="Ej. 1"
+          error={errors.ownerId}
+        />
 
         {/*Name input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Nombre del Establecimiento: 
-            </label>
-          
-            <input 
-            type="text" 
-            class="form-control"
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value })} 
-            placeholder='Ej: Canchas Cacho'
-            style={{ maxWidth: "250px" }}/>
-          
-        </div>
+        <FormFieldComponent
+          label="Nombre del establecimiento"
+          type='text'
+          value={formData.name}
+          onChange={e => setFormData({...formData, name:e.target.value})}
+          onBlur={() => handleBlur("name", formData.name)}
+          placeholder="Canchas de Fútbol"
+          error={errors.name}
+        />
         {/*Phone input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Número de Teléfono: 
-            </label>
-          
-            <input 
-            type="text" 
-            class="form-control"
-            value={formData.telephoneNumber}
-            onChange={(e) => setFormData({...formData, telephoneNumber: e.target.value })} 
-            placeholder='Ej: 541100000'
-            style={{ maxWidth: "250px" }}/>
-          
-        </div>
+        <FormFieldComponent
+          label="Número de telefono"
+          value={formData.telephoneNumber}
+          placeholder={15123123}
+          type='text'
+          onChange={e => setFormData({...formData, telephoneNumber: e.target.value})}
+          onBlur={() => handleBlur("telephoneNumber", formData.telephoneNumber)}
+          error={errors.telephoneNumber}
+        />
         {/*Description input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Descripcion del Establecimiento: 
-            </label>
-          
-            <textarea
-             
-            
-            value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value })} 
-            placeholder='Ej: Hermoso establecimiento ideal para jugar un partido y luego charlar con amigos'
-            rows={4}
-            cols={50}
-            style={{ width: "250px",resize: "vertical"}}></textarea>
-          
-        </div>
+        <FormFieldComponent
+          label="Descripción"
+          value={formData.description} 
+          placeholder="Descripcion del lugar"
+          as='textarea'
+          onChange={e => setFormData({...formData, description: e.target.value})}
+          onBlur={() => handleBlur("description", formData.description)}
+          error={errors.description}
+        />
 
         {/* amenities inputs*/}
         <h5 className='text-center'>Seleccione las caracteristicas</h5>

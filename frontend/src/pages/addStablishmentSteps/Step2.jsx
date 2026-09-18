@@ -2,7 +2,34 @@ import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 import { useApi } from "../../context/AxiosInstance";
 import { MapComponent } from "../../Component/MapComponent";
+import { FormFieldComponent } from "../../Component/FormFieldComponent";
+import { useFormValidations } from "../../hooks/useFormValidations";
+const validators = {
+  country: (v) => {
+    if(!v) return "El país es obligatirio"
+    return ""
+  },
 
+  province: (v) => {
+    if(!v) return "La provincia es obligatoria"
+    return ""
+  },
+
+  city: (v) => {
+    if(!v) return "La ciudad es obligatoria"
+    return ""
+  },
+
+  street: (v) => {
+    if(!v) return "La calle es obligatoria"
+    return ""
+  },
+
+  number: (v) => {
+    if(!v) return "El número es obligatorio"
+    return ""
+  }
+}
 
 export const Step2 =  ( { formData, setFormData, onNext, onBack} ) => {
 
@@ -16,6 +43,7 @@ export const Step2 =  ( { formData, setFormData, onNext, onBack} ) => {
     const [regions, setRegions] = useState([]);
     const [cities, setCities] = useState([]);
     const [error, setError] = useState(null);
+    const {errors, handleBlur} = useFormValidations(validators)
 
     /* fetch the countries for the option menu*/
     useEffect(() => {
@@ -53,7 +81,7 @@ export const Step2 =  ( { formData, setFormData, onNext, onBack} ) => {
     
     /* main function it validates that the address is unique on the backend and continues*/
     const validateAndNext = async () => {
-    
+
         try {
             const address = await api.get(`/address/exists/${formData.country}/${formData.city}/${formData.street}/${formData.number}`);
     
@@ -116,84 +144,106 @@ export const Step2 =  ( { formData, setFormData, onNext, onBack} ) => {
       <h5 className="mb-4">Dirección</h5>
 
       {/* Country */}
-      <div className="mb-3 row align-items-center">
-        <label label className="col-sm-4 col-form-label">País</label>
-        <div className="col-sm-8">
-          <select className="form-select" value={formData.country} onChange={handleCountryChange}>
-            <option value="">Seleccione un país</option>
+
+      <FormFieldComponent
+        label="País"
+        value={formData.country} 
+        as='select'
+        onChange={handleCountryChange}
+        onBlur={() => handleBlur("country", formData.country)}
+        error={errors.country} 
+      >
+        <option value="">Seleccione un país</option>
             {countries.map((c) => (
               <option key={c.code} value={c.code}>{c.name}</option>
             ))}
-          </select>
+      </FormFieldComponent>
+      {/* 
+      
+        <div className="mb-3 row align-items-center">
+          <label label className="col-sm-4 col-form-label">País</label>
+          <div className="col-sm-8">
+            <select className="form-select" value={formData.country} onChange={handleCountryChange}>
+              <option value="">Seleccione un país</option>
+              {countries.map((c) => (
+                <option key={c.code} value={c.code}>{c.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
+      */}
 
       {/* Province */}
-        <div className="mb-3 row align-items-center">
-          <label label className="col-sm-4 col-form-label">Provincia / Estado</label>
-        <div className="col-sm-8">
-          <select className="form-select" value={formData.province} onChange={handleRegionChange} disabled={!regions.length}>
-            <option value="">Seleccione una provincia</option>
+
+      <FormFieldComponent
+        label="Provincia"
+        value={formData.province} 
+        as='select'
+        onChange={handleRegionChange}
+        onBlur={() => handleBlur("province", formData.province)}
+        error={errors.province}
+        disabled={!regions.length} 
+      >
+        <option value="">Seleccione una provincia</option>
             {regions.map((r) => (
               <option key={r.code} value={r.code}>{r.name}</option>
             ))}
-          </select>
-        </div>
-      </div>
+      </FormFieldComponent>
+        
 
       {/* City */}
-     <div className="mb-3 row align-items-center">
-          <label label className="col-sm-4 col-form-label">Ciudad</label>
-        <div className="col-sm-8">
-          <select className="form-select" value={formData.city} onChange={handleCityChange} disabled={!cities.length}>
-            <option value="">Seleccione una ciudad</option>
+      <FormFieldComponent
+        label="Cuidad"
+        value={formData.city} 
+        as='select'
+        onChange={handleCityChange}
+        onBlur={() => handleBlur("city", formData.city)}
+        error={errors.city} 
+        disabled={!cities.length}
+      >
+        <option value="">Seleccione una Ciudad</option>
             {cities.map((c) => (
-              <option key={c.id} value={c.name}>{c.name}</option>
+              <option key={c.code} value={c.code}>{c.name}</option>
             ))}
-          </select>
-
-        </div>
-      </div>
+      </FormFieldComponent>
+  
 
       {/* Postal Code */}
-     <div className="mb-3 row align-items-center">
-          <label label className="col-sm-4 col-form-label">Código Postal</label>
-        <div className="col-sm-8">
-          <input className="form-control"
-          type="text" 
-          value={formData.postalCode} 
-          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })} 
-          disabled={!cities.length}
-          placeholder="Código Postal" />
-        </div>
-      </div>
+      <FormFieldComponent
+        label="Código Postal"
+        value={formData.postalCode} 
+        type='text'
+        onChange={e => setFormData({...formData, postalCode: e.target.value})}
+        placeholder="5800" 
+        disabled={!cities.length}
+      >
+    
+      </FormFieldComponent>
+     
 
       {/* Street */}
-        <div className="mb-3 row align-items-center">
-          <label label className="col-sm-4 col-form-label">Calle</label>
-        <div className="col-sm-8">
-          <input className="form-control" 
-          type="text" 
-          value={formData.street} 
-          onChange={(e) => setFormData({ ...formData, street: e.target.value })} 
-          disabled={!cities.length} 
-          placeholder="Calle" />
-        </div>
-      </div>
-
-
+      <FormFieldComponent
+          label="Calle"
+          type='text'
+          value={formData.street}
+          onChange={e => setFormData({...formData, street:e.target.value})}
+          onBlur={() => handleBlur("street", formData.street)}
+          placeholder="Sán Martin"
+          error={errors.street}
+          disabled={!cities.length}
+        />
+        
       {/* Number */}
-      <div className="mb-3 row align-items-center">
-          <label label className="col-sm-4 col-form-label">Número</label>
-        <div className="col-sm-8">
-          <input className="form-control"
-            type="text" 
-           value={formData.number} 
-           onChange={(e) => setFormData({ ...formData, number: e.target.value })} 
-           disabled={!cities.length}
-           placeholder="Número" />
-        </div>
-      </div>
+      <FormFieldComponent
+          label="Número"
+          type='text'
+          value={formData.number}
+          onChange={e => setFormData({...formData, number:e.target.value})}
+          onBlur={() => handleBlur("number", formData.number)}
+          placeholder="123"
+          error={errors.number}
+          disabled={!cities.length}
+        />
 
       {/* Navigation buttons */}
       <div className="d-flex justify-content-center gap-3 mt-4 mb-5">

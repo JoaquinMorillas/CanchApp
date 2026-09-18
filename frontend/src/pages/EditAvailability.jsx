@@ -1,5 +1,5 @@
 import { useApi } from '../context/AxiosInstance'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 
 import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
@@ -37,6 +37,18 @@ export const EditAvailability = () => {
     }
     /* Main Function, saves the changes and navigate back to the EditSportField Page */
     const saveChanges = async () =>{
+        if(isActive){
+
+            if(beginingTime >= endingTime){
+                Swal.fire({
+                    title: "Error",
+                    text:"El horario de inicio debe ser anterior al horario de cierre",
+                    icon:"error",
+                    showCloseButton:true
+                })
+                return
+            }
+        }
         const confirmed = await Swal.fire({
             title:"Atencion",
             text: `¿Estas seguro que quieres guardar los cambios?`,
@@ -66,7 +78,7 @@ export const EditAvailability = () => {
                 })
 
                 setTimeout(() => {
-                    navigate(`administracion/canchas/editar/${updatedAvailability.sportFieldId}`)
+                    navigate(-1)
                 }, 2000)
 
             }catch(error){
@@ -120,7 +132,7 @@ export const EditAvailability = () => {
         <div className='container'>
 
             <div className='row d-flex justify-content-center '>
-                <div className='col-3' >
+                <div className='col-3 me-3' >
                     <InputComponent label='Desde' type="time" value={beginingTime} setValue={setBeginingTime} disabled={disableBeginingTime}/>
                 </div>
                 <div className='col-3 mb-5' >
@@ -135,7 +147,7 @@ export const EditAvailability = () => {
             {/* EndingTime Input */}
 
             <div className='row d-flex justify-content-center '>
-                <div className='col-3' >
+                <div className='col-3 me-3' >
                     <InputComponent label='Hasta' type="time" value={endingTime} setValue={setEndingTime} disabled={disableEndingTime}/>
                 </div>
                 <div className='col-3 mb-5' >

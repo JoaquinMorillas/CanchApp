@@ -163,7 +163,10 @@ export const StablishmentCardComponent = ( { stablishment }) => {
           </button>
 
           <button className="position-absolute"
-            title="Añadir a Favoritos"
+            aria-label={user && user.favorites?.some(id => id == stablishment.id)
+              ? "Quitar de favoritos"
+              : "Agregar a favoritos"
+  }
             onClick= {user && user.favorites?.some(id => id == stablishment.id)
               ?() => handleDeleteFavorite()
               :() => handleAddFavorite()
@@ -188,6 +191,7 @@ export const StablishmentCardComponent = ( { stablishment }) => {
             <img src={user && user.favorites?.some(id => id == stablishment.id) 
             ? '/icons8-estrella-50(1).png'
             :'/icons8-estrella-50.png'}
+            alt=""
             style={{ width: "25px", height: "25px" }}>
             </img>
           </button>

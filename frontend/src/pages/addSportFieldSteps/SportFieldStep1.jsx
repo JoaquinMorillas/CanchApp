@@ -2,6 +2,37 @@ import { useApi } from '../../context/AxiosInstance'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { NavLink } from 'react-router-dom'
+import { FormFieldComponent } from '../../Component/FormFieldComponent'
+import { useFormValidations } from '../../hooks/useFormValidations'
+
+const validators = {
+  name: (v) => {
+    if(!v) return "El nombre es obligatorio"
+    return ""
+  },
+  price: (v) => {
+    if(!v) return "El precio es obligatorio"
+    if(v == 0) return "el precio  no puede ser 0"
+    if(v < 0) return "El precio no puede negativo"
+    return ""
+
+  },
+  hours: (v) => {
+    if(!v) return "las horas son obligatorias"
+    if(v < 0) return "las horas no pueden ser negativas"
+    return ""
+  },
+  minutes: (v) => {
+    if(!v) return "los minutos son obligatorios"
+    if(v < 0) return "los minutos no pueden ser negativos"
+    return ""
+  },
+  sport: (v) => {
+    if(!v) return "el deporte es obligatorio"
+    return ""
+  }
+
+}
 
 export const SportFieldStep1 = ({stablishment, formData, setFormData, onNext, setSportFieldId}) => {
 
@@ -10,6 +41,7 @@ export const SportFieldStep1 = ({stablishment, formData, setFormData, onNext, se
   const [hours, setHours] = useState(0)
   const [minutes, setMinutes] = useState(0)
   const [sports, setSports] = useState([])
+  const {errors, handleBlur} = useFormValidations(validators)
   
   /* helper function to parse the duration to feed it correclty to the backend*/
   const duration = (hours, minutes) => {
@@ -102,97 +134,73 @@ export const SportFieldStep1 = ({stablishment, formData, setFormData, onNext, se
         <h5 className='text-center'>Datos de la cancha</h5>
 
         {/* Name input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Nombre de la cancha: 
-            </label>
-          
-            <input 
-            type="text" 
-            class="form-control"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
-            placeholder='Ej: Cancha 1'
-            style={{ maxWidth: "250px" }}
-            required/>
-          
-        </div>
+        <FormFieldComponent 
+          label="Nombre de la cancha"
+          type='text'
+          value={formData.name}
+          onBlur={() => handleBlur("name", formData.name)}
+          onChange={e => setFormData({...formData, name: e.target.value})}
+          placeholder="Ej. Cancha 1"
+          error={errors.name}
+        />
+
 
         {/* price input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Precio de la reserva: 
-            </label>
-          
-            <input 
-            type="number"
-            step="0.1"
-            min= "0" 
-            class="form-control"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })} 
-            placeholder='Ej. 5.50'
-            style={{ maxWidth: "250px" }}
-            required/>
-          
-        </div>
+        <FormFieldComponent 
+          label="Precio"          
+          type='number'
+          value={formData.price}
+          onBlur={() => handleBlur("price", formData.price)}
+          onChange={e => setFormData({...formData, price: e.target.value})}
+          placeholder="10.000"
+          error={errors.price}
+          step="500"
+          min="0"
+        />
 
-        {/* Reservation input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Duracion de la Reserva(Horas, Minutos): 
-            </label>
-          
-            <input 
-            type="number" 
-            min="0"
-            class="form-control"
-            value={hours}
-            onChange={(e) => setHours(e.target.value)} 
-            placeholder='Horas'
-            style={{ maxWidth: "250px" }}/>
+        {/* Duration input*/}
+        <FormFieldComponent 
+          label="Duracion(Horas)"          
+          type='number'
+          value={hours}
+          onBlur={() => handleBlur("hours", hours)}
+          onChange={e => setHours(e.target.value)}
+          placeholder="horas"
+          error={errors.hours}
+          step="1"
+          min="0"
+        />
 
-            <input 
-            type="number"
-            min="0" 
-            step="5"
-            class="form-control"
-            value={minutes}
-            onChange={(e) => setMinutes(e.target.value)} 
-            placeholder='minutos'
-            style={{ maxWidth: "250px" }}
-            required/>
-          
-        </div>
+        <FormFieldComponent 
+          label="Duracion(Minutos)"          
+          type='number'
+          value={minutes}
+          onBlur={() => handleBlur("minutes", minutes)}
+          onChange={e => setMinutes(e.target.value)}
+          placeholder="Minutos"
+          error={errors.minutes}
+          step="1"
+          min="0"
+        />
+      
 
         {/* Sport input*/}
-        <div class="mb-3 d-flex align-items-center">
-          
-            <label  className="me-3 mb-0"
-            style={{  width: "250px", textAlign: "right" }}>
-              Deporte de la cancha: 
-            </label>
-          
-            <select
-            type="text" 
-            class="form-control"
-            value={formData.sport}
-            onChange={(e) => setFormData({ ...formData, sportName: e.target.value })} 
-            placeholder='futbol 7'
-            style={{ maxWidth: "250px" }}
-            >
-            <option key={"default"} value={""}>Seleccione un deporte</option>
+        <FormFieldComponent 
+          label="Deporte"          
+          as="select"
+          value={formData.sport}
+          onBlur={() => handleBlur("sport", formData.sport)}
+          onChange={e => setFormData({...formData, sportName: e.target.value})}
+          placeholder="Fútbol"
+          error={errors.sport}
+        >
+          <option key={"default"} value={""}>Seleccione un deporte</option>
             {sports.map((s) => (
               <option key={s.name} value={s.name}>{s.name}</option>
             ))}
-            </select>  
-        </div>
+        </FormFieldComponent>
+        
+        
 
         <div className="d-flex justify-content-center mt-4 gap-3">
           <NavLink to = "/administracion">

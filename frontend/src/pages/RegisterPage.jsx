@@ -4,9 +4,36 @@ import Swal from 'sweetalert2'
 import { useApi } from '../context/AxiosInstance'
 import { useNavigate } from 'react-router-dom'
 import { InputComponent } from '../Component/InputComponent'
+import { FormFieldComponent } from '../Component/FormFieldComponent'
+import { useFormValidations } from '../hooks/useFormValidations'
 
 export const RegisterPage = () => {
+    const validators = {
+        firstName: (v) => {
+            if(!v.trim()) return "El nombre es obligatorio"
+            return ""
+        },
+        lastName: (v) => {
+            if(!v.trim()) return "El apellido es obligatorio"
+            return ""
+        },
+        email: (v) => {
+            if(!v) return "El correo electrónico es obligatorio"
+            if(!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))) return "El correo electrónico no es valido"
+            return ""
+        },
+        password: (v) => {
+            if(!(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/.test(v))) return "La contraseña debe tener 8 caracteres, tener un número, una mayúscula y un caracter especial"
+            if(!v) return "La contraseña es obligatoria"
+            return ""
+        },
+        confirmPassword: (v) => {
+            if(v!==password) return "La contraseña no coincide con la anterior"
+            return ""
+        }
+    }
     const {register} = useContext(AuthContext)
+    const {errors, handleBlur} = useFormValidations(validators)
     const navigate = useNavigate()
     
     const [firstName, setFirstName] = useState("")
@@ -22,7 +49,7 @@ export const RegisterPage = () => {
         if(!firstName){
             Swal.fire({
                 title:"error",
-                text:"Se nececita agreagar un nombre",
+                text:"Se requiere un nombre",
                 icon:"error",
                 showCloseButton:true
             })
@@ -31,7 +58,7 @@ export const RegisterPage = () => {
          if(!lastName){
             Swal.fire({
                 title:"error",
-                text:"Se nececita agreagar un apellido",
+                text:"Se requiere un apellido",
                 icon:"error",
                 showCloseButton:true
             })
@@ -40,7 +67,7 @@ export const RegisterPage = () => {
          if(!password){
             Swal.fire({
                 title:"error",
-                text:"Se nececita agreagar una contraseña",
+                text:"Se requiere una contraseña",
                 icon:"error",
                 showCloseButton:true
             })
@@ -49,7 +76,7 @@ export const RegisterPage = () => {
         if(!confirmPassword){
             Swal.fire({
                 title:"error",
-                text:"Se nececita agreagar una contraseña",
+                text:"Se requiere una contraseña",
                 icon:"error",
                 showCloseButton:true
             })
@@ -64,6 +91,17 @@ export const RegisterPage = () => {
                 showCloseButton:true
             })
             return
+        }
+        if(password !== confirmPassword){
+            
+            Swal.fire({
+                title:"Error",
+                text:"La contraseña no coincide con la confirmacion de contraseña",
+                icon:"error",
+                showCloseButton:true
+            })
+            return
+                    
         }
         
         const response = await register(firstName, lastName, email, password)
@@ -82,22 +120,52 @@ export const RegisterPage = () => {
             <div className='container'>
                 <div className='row'>
                     <div className='col-8'>
-                        <InputComponent label="Nombre"type="text" value={firstName} setValue={setFirstName}/>
+                        <FormFieldComponent
+                        label="Nombre"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        error={errors.firstName}
+                        onBlur={() => handleBlur("firstName", firstName)}
+                        />
+                        
                     </div>
                 </div>
                 <div className='row'>
                     <div className='col-8'>
-                        <InputComponent label="Apellido" type="text" value={lastName} setValue={setLastName}/>
+                        <FormFieldComponent
+                        label="Apellido"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        error={errors.lastName}
+                        onBlur={() => handleBlur("lastName", lastName)}
+                        />
+                       
                     </div>
                 </div>
                 <div className='row'>
                     <div className='col-8'>
-                        <InputComponent label="Email" type="text" value={email} setValue={setEmail}/>
+                        <FormFieldComponent
+                        label="Correo Electrónico"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        error={errors.email}
+                        onBlur={() => handleBlur("email", email)}
+                        />
+                      
                     </div>
                 </div>
                 <div className='row'>
                     <div className='col-8'>
-                        <InputComponent label="contraseña" type={isPasswordVisible ? "text" : "password"} value={password} setValue={setPassword}/>
+                        <FormFieldComponent
+                        label="Contraseña"
+                        type={isPasswordVisible ? "text" : "password"}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        error={errors.password}
+                        onBlur={() => handleBlur("password", password)}
+                        />
+
+                
                     </div>
                     <div className='col-4'>
                         <img src={isPasswordVisible ? "icons8-visible-32.png" : "icons8-ojo-cerrado-32.png"} 
@@ -108,7 +176,15 @@ export const RegisterPage = () => {
                 </div>
                 <div className='row'>
                     <div className='col-8'>
-                        <InputComponent label="Confirmar Contraseña" type={isConfirmVisible ? "text" : "password"} value={confirmPassword} setValue={setConfirmPassword}/>
+                        <FormFieldComponent
+                        label="Confirmar Contraseña"
+                        type={isConfirmVisible ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        error={errors.confirmPassword}
+                        onBlur={() => handleBlur("confirmPassword", confirmPassword)}
+                        />
+                        
                     </div>
                     <div className='col-4'>
                         <img src={isConfirmVisible ? "icons8-visible-32.png" : "icons8-ojo-cerrado-32.png"} 

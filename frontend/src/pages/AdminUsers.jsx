@@ -120,11 +120,11 @@ export const AdminUsers = () => {
                       </td>
                       <td>
                         <div className='d-flex justify-content-center'>
-                          <button className='btn btn-danger m-2' 
+                          <button className='btn btn-info m-2' 
                           onClick={() => changeRole(admin.id, "USER")}>
                             Cambiar a "Jugador"
                             </button>
-                          <button className='btn btn-danger m-2'
+                          <button className='btn btn-warning m-2'
                           onClick={() => changeRole(admin.id, "OWNER")}>
                             Cambiar a "Dueño"
                             </button>
@@ -180,7 +180,7 @@ export const AdminUsers = () => {
                   onClick={() => changeRole(owner.id , "ADMIN")}>
                     Cambiar a "Administrador"
                     </button>
-                  <button className='btn btn-danger m-2'
+                  <button className='btn btn-info m-2'
                   onClick={() => changeRole(owner.id, "USER")}>
                     Cambiar a "Jugador"
                     </button>
@@ -232,7 +232,7 @@ export const AdminUsers = () => {
               onClick={() => changeRole(player.id, "ADMIN")}>
                 Cambiar a "Administrador"
                 </button>
-              <button className='btn btn-danger m-2'
+              <button className='btn btn-warning m-2'
               onClick={() => changeRole(player.id, "OWNER")}>
                 Cambiar a "Dueño"
                 </button>

@@ -55,7 +55,7 @@ export const AuthProvider = ({children}) =>{
                 return false
             }
             Swal.fire({
-                title:"Error al intentat acceder",
+                title:"Error al intentar acceder",
                 text:error.response?.data?.message || error.response?.data || error.message,
                 icon:"error",
                 showCloseButton:true
