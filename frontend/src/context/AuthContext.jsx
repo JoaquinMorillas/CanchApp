@@ -10,7 +10,7 @@ export const AuthContext = createContext()
 export const AuthProvider = ({children}) =>{
     
     const navigate = useNavigate()
-    const baseUrl = "http://localhost:8080"
+    const baseUrl = import.meta.env.VITE_API_URL
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
 

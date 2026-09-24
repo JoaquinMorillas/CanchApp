@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 export const useApi = () => {
 
     const {token, setToken, logOut} = useContext(AuthContext)
-    const baseURL = "http://localhost:8080"
+    const baseURL = import.meta.env.VITE_API_URL
     
     //creation of a axios instance in order to send the JWT with all the requests made
     const api = axios.create({

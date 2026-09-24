@@ -39,7 +39,7 @@ export const StablishmentInfo = () => {
     const [lat, setLat] = useState("")
     const MySwal = withReactContent(Swal);
 
-    const baseURL = "http://localhost:8080"
+    const baseURL = import.meta.env.VITE_API_URL
 
     const handleRate = async () => {
         if(!user){

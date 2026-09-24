@@ -41,3 +41,4 @@ backend/src/main/resources/application.properties
 **/frontend/node_modules/
 # Ignore environment variables
 .env
+frontend/.env

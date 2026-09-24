@@ -14,7 +14,7 @@ import { StablishmentContext } from '../context/StablishmentContext';
 export const ReserveByStablishmentAndSportPage = () => {
   /* used States */
   const api = useApi()
-  const baseUrl = "http://localhost:8080"
+  const baseUrl = import.meta.env.VITE_API_URL
   const params = useParams()
   const {stablishments} = useContext(StablishmentContext)
   const {startLoading, stopLoading} = useContext(LoadingContext)

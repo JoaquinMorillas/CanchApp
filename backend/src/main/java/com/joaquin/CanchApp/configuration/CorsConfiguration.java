@@ -6,6 +6,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /* for now all users can perform any method this will be changed once JWT is been implemented */
+/*
+
 @Configuration
 public class CorsConfiguration {
      @Bean
@@ -23,3 +25,4 @@ public class CorsConfiguration {
         };
     }
 }
+*/

@@ -13,7 +13,7 @@ export const StablishmentProvider = ({ children }) => {
     };
     const api = useApi()
     
-    const baseURL = "http://localhost:8080/stablishment"
+    const baseURL = import.meta.env.VITE_API_URL + "/stablishment"
 
     const stablishmentReducer = (state, action) => {
         switch(action.type){

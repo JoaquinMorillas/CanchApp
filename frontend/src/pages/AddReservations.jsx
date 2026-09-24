@@ -11,7 +11,7 @@ import { LoadingContext } from '../context/LoadingContext';
 export const AddReservations = () => {
     /* Used States*/
     const api = useApi()
-    const baseUrl = "http://localhost:8080"
+    const baseUrl = import.meta.env.VITE_API_URL
     const { id } = useParams()
     const {startLoading, stopLoading} = useContext(LoadingContext)
     const navigate = useNavigate()

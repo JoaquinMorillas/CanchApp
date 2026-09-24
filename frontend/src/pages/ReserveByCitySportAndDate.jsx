@@ -10,7 +10,7 @@ export const ReserveByCitySportAndDate = () => {
     /* used States */
     const api = useApi()
     const {startLoading, stopLoading} = useContext(LoadingContext)
-    const baseUrl = "http://localhost:8080"
+    const baseUrl = import.meta.env.VITE_API_URL
     const params = useParams()
     const [sportFields, setSportFields] = useState([])
     const [slotsBySportFields, setSlotsBySportFields] = useState({})

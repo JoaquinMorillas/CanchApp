@@ -29,7 +29,7 @@ export const SearcherComponent = () => {
     const [showCitiesSuggestions, setShowCitiesSuggestions] = useState(false);
     const [showSportsSuggestions, setShowSportsSuggestions] = useState(false);
 
-    const baseUrl = "http://localhost:8080"
+    const baseUrl = import.meta.env.VITE_API_URL
 
     const handleSearch = () => {
       if(!selectedCity){
