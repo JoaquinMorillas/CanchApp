@@ -179,18 +179,29 @@ export const EditSportsPage = () => {
         })
 
         if(confirm.isConfirmed){
+            
             let sentSport = {}
             if(editIcon){
-
-                const uploadData = new FormData();  
-                uploadData.append("files", editIcon);
-                const iconResponse = await api.post("/images/upload", uploadData);
-                const sentIconUrl = iconResponse.data[0].imageUrl
-                sentSport = {
-                    "name" : editName,
-                    "category" : editCategory,
-                    "imgUrl" : sentIconUrl || null
-                }
+                try{
+                    startLoading()
+                    const uploadData = new FormData();  
+                    uploadData.append("files", editIcon);
+                    const iconResponse = await api.post("/images/upload", uploadData);
+                    const sentIconUrl = iconResponse.data[0].imageUrl
+                    sentSport = {
+                        "name" : editName,
+                        "category" : editCategory,
+                        "imgUrl" : sentIconUrl || null
+                    }
+                }catch(error){
+                Swal.fire({
+                    title: "Error",
+                    text: error.response?.data?.message || error.response?.data || error.message,
+                    icon: "error"
+                })
+            }finally{
+                stopLoading()
+            }
             }else{
                 sentSport = {
                     "name" : editName,
@@ -225,6 +236,7 @@ export const EditSportsPage = () => {
             }finally{
                 stopLoading()
             }
+            
         }
     }
 

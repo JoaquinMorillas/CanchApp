@@ -29,6 +29,7 @@ import com.joaquin.CanchApp.exception.ReservationUserIsNullException;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.service.ReservationService;
 
 
@@ -58,26 +59,29 @@ public class ReservationController {
     public ResponseEntity<List<SlotDTO>> generateSlotsForDateRange(
         @RequestParam Integer sportFieldId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) throws SportFieldIdNotFoundException{
-        List<SlotDTO> slots = reservationService.generateSlotsForDateRange(sportFieldId, startDate, endDate);
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+        @AuthenticationPrincipal User user
+    ) throws SportFieldIdNotFoundException, UserIsNotTheOwnerException{
+        List<SlotDTO> slots = reservationService.generateSlotsForDateRange(sportFieldId, startDate, endDate,user);
         return ResponseEntity.ok(slots);
     }
 
 
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<ReservationDTO>> getReservationsByUserId(@PathVariable Integer id){
-        List<ReservationDTO> dtos = reservationService.findByUser(id);
+    public ResponseEntity<List<ReservationDTO>> getReservationsByUserId(
+        @PathVariable Integer id,
+        @AuthenticationPrincipal User user) throws UserIsNotTheOwnerException{
+        List<ReservationDTO> dtos = reservationService.findByUser(id, user);
         return ResponseEntity.ok(dtos);
     }
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<ReservationDTO> cancelReservation(
         @PathVariable Integer id,
-        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, ReservationUserIdIsDiferentFromTheIdSuppliedException, ReservationUserIsNullException{
+        @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, ReservationUserIsNullException, UserIsNotTheOwnerException{
         
-        ReservationDTO dto = reservationService.cancelReservation(id, user.getId());
+        ReservationDTO dto = reservationService.cancelReservation(id, user);
         return ResponseEntity.ok(dto);
     }
 
@@ -85,7 +89,7 @@ public class ReservationController {
     public ResponseEntity<ReservationDTO> confirmReservation(
         @PathVariable Integer reservationId, 
         @AuthenticationPrincipal User user) throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException, ReservationDateIsBeforeCurrentDate{
-        ReservationDTO dto = reservationService.confirmReservarion(reservationId, user.getId());
+        ReservationDTO dto = reservationService.confirmReservarion(reservationId, user);
         return ResponseEntity.ok(dto);
     }
 }

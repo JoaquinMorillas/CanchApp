@@ -24,29 +24,44 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.joaquin.CanchApp.dto.ReservationDTO;
 import com.joaquin.CanchApp.dto.SlotDTO;
+import com.joaquin.CanchApp.dto.UserDTO;
 import com.joaquin.CanchApp.entity.Availability;
 import com.joaquin.CanchApp.entity.Reservation;
 import com.joaquin.CanchApp.entity.ReservationStatus;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.Slot;
 import com.joaquin.CanchApp.entity.SportField;
+import com.joaquin.CanchApp.entity.User;
+import com.joaquin.CanchApp.exception.EmailAlreadyExistsExcepction;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.repository.AvailabilityRespository;
 import com.joaquin.CanchApp.repository.ReservationRepository;
 
 import com.joaquin.CanchApp.repository.SportFieldRepository;
+import com.joaquin.CanchApp.repository.UserRepository;
 import com.joaquin.CanchApp.service.ReservationService;
+import com.joaquin.CanchApp.service.UserService;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
 public class ReservationControllerTest {
+
+    @Autowired 
+    private UserRepository userRepository;
+
+    @Autowired 
+    private UserService userService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,12 +79,50 @@ public class ReservationControllerTest {
     private ReservationRepository reservationRepository;
 
     private List<Integer> reservationsIds = new ArrayList<>();
+    
+    private Integer userId;
+    private Integer ownerId;
+    private Integer adminId;
 
     @BeforeEach
     @WithMockUser(username = "test", roles = {"ADMIN"})
-    public void dataLoad() throws SportFieldIdNotFoundException {
+    public void dataLoad() throws EmailAlreadyExistsExcepction, SportFieldIdNotFoundException, UserIsNotTheOwnerException{
+        User admin = User.builder()
+        .firstName("usuario1")
+        .lastName("lastname1")
+        .email("usuario1@lastname1.com")
+        .password("hola")
+        .role(Role.ADMIN)
+        .build();
+
+        User owner = User.builder()
+        .firstName("usuario2")
+        .lastName("lastname2")
+        .email("usuario2@lastname2.com")
+        .password("hola")
+        .role(Role.OWNER)
+        .build();
+
+        User user = User.builder()
+        .firstName("usuario3")
+        .lastName("lastname3")
+        .email("usuario3@lastname3.com")
+        .password("hola")
+        .role(Role.USER)
+        .build();
+
+        UserDTO adminUser = userService.saveUser(admin);
+        UserDTO ownerUser = userService.saveUser(owner);
+        UserDTO userUser = userService.saveUser(user);
+
+        adminId = adminUser.getId();
+        ownerId = ownerUser.getId();
+        userId = userUser.getId();
+
         SportField field = sportFieldRepository.findById(1)
         .orElseThrow(() -> new SportFieldIdNotFoundException(1));
+
+
 
         Availability thu = Availability.builder()
             .sportField(field)
@@ -95,7 +148,7 @@ public class ReservationControllerTest {
         availabilityRepository.save(wed);
         availabilityRepository.flush();
         
-        List<SlotDTO> dtosSaved = reservationService.generateSlotsForDateRange(1, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 25));
+        List<SlotDTO> dtosSaved = reservationService.generateSlotsForDateRange(1, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 25), admin);
 
         reservationsIds = dtosSaved.stream()
         .map(SlotDTO::getId)
@@ -118,11 +171,18 @@ public class ReservationControllerTest {
         assertThat(reservationsIds).hasSizeGreaterThan(0);
     }
 
+
     @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
+    @WithUserDetails(value = "usuario3@lastname3.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testCancelReservation() throws Exception {
+        
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User de test no encontrado"));
+
         Integer reservationId = reservationsIds.get(0);
-        reservationService.confirmReservarion(reservationId, 1);
+        reservationService.confirmReservarion(reservationId, user);
 
         mockMvc.perform(put("/reservation/cancel/" + reservationId))
                         .andExpect(status().isOk())
@@ -133,9 +193,11 @@ public class ReservationControllerTest {
     }
     
     @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
+    @WithUserDetails(value = "usuario1@lastname1.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testConfirmReservation() throws Exception {
-        mockMvc.perform(put("/reservation/confirm/" + reservationsIds.get(0) + "/1"))
+        mockMvc.perform(put("/reservation/confirm/" + reservationsIds.get(0)))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.id").value(reservationsIds.get(0)))
                         .andExpect(jsonPath("$.userId").value("1"))
@@ -143,7 +205,9 @@ public class ReservationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
+    @WithUserDetails(value = "usuario1@lastname1.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testFindBySportFieldAndDate() throws Exception {
         mockMvc.perform(get("/reservation/sport-field/" + reservationsIds.get(0) + "?date=2025-12-24"))
                         .andExpect(status().isOk());
@@ -153,15 +217,19 @@ public class ReservationControllerTest {
     
 
     @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
+    @WithUserDetails(value = "usuario1@lastname1.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testGenerateSlotsForDateRange() throws Exception {
-        mockMvc.perform(post("/reservation/generate-slots?sportFieldId=1&startDate=2026-01-01&endDate=2026-01-02"))
+        mockMvc.perform(post("/reservation/generate-slots?sportFieldId=1&startDate=2027-01-01&endDate=2027-01-02"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(greaterThan(0))));
     }
 
     @Test
-    @WithMockUser(username = "test", roles = {"ADMIN"})
+    @WithUserDetails(value = "usuario1@lastname1.com", 
+        userDetailsServiceBeanName = "userDetailsService",
+        setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testGetReservationsByUserId() throws Exception {
         mockMvc.perform(get("/reservation/user/1"))
                         .andExpect(status().isOk())

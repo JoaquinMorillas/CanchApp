@@ -6,6 +6,7 @@ import Calendar from 'react-calendar'
 import "react-calendar/dist/Calendar.css"
 import { icon } from 'leaflet'
 import Swal from 'sweetalert2'
+import { SportFieldReservationCardComponent } from '../Component/SportFieldReservationCardComponent'
 
 
 export const AdminReservations = () => {
@@ -172,109 +173,36 @@ export const AdminReservations = () => {
         {selectedStablishment && (
             <div>
                 <h3 className='text-center'>{selectedStablishment.name}</h3>
-                <div  className="d-flex justify-content-center">
+                <div  className="d-flex justify-content-center mb-3">
 
                     <Calendar onChange={setCurrentDate} value={currentDate}
                     ></Calendar>
                 </div>
-                <h5 className='text-center'>
+                <h2 className='text-center'>
                    Reservas del día {currentDate.toLocaleDateString()}
-                </h5>
+                </h2>
                 {selectedSportFields?.length > 0 && selectedSportFields.map((sportField) =>{
                     const reservations = selectedReservations[sportField.id] || []
                     const slots = selectedSlots[sportField.id] || []
                     return(
-                        <div key={sportField.id} className="mb-4">
-                            <h5>{sportField.name}</h5>
-
-                            {reservations.length === 0 ? (
-                                <p>No hay reservas todavia</p>
-                            ) : (
-                                <>
-                                    <h3>Reservas</h3>
-                                    <table className="table table-striped table-hover">
-                                    <thead style={{ position: 'sticky',
-                                    top: 55,
-                                    zIndex: 2,
-                                    backgroundColor: 'var(--bs-light)', }}>
-                                    <tr>
-                                        <th scope="col" className='text-center'>Hora de entrada</th>
-                                        <th scope="col" className='text-center'>Hora de finalizacion</th>
-                                        <th scope="col" className='text-center'>Nombre de usuario</th>
-                                        <th scope="col" className='text-center'>Estado</th>
-                                        <th scope="col" className='text-center'>Cancelar Reserva</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        {reservations.map((reservation) => (
-                                            <tr key={reservation.id}
-                                            className={getRowClass(reservation.reservationStatus)}>
-                                                <td className='text-center'>
-                                                    {reservation.beginingHour}
-                                                </td>
-                                                <td className='text-center'>
-                                                    {reservation.finishingHour}
-                                                </td>
-                                                <td className='text-center'>
-                                                    {reservation.userName}
-                                                </td>
-                                                <td className='text-center'>
-                                                    {reservation.reservationStatus}
-                                                </td>
-                                                <td className='text-center'>
-                                                    {reservation.reservationStatus=="CONFIRMED" && (
-
-                                                    <button className='btn btn-danger'
-                                                    onClick={() => handleCancelReservation(reservation)}>Cancelar Reserva</button>
-                                                    )}
-                                                </td>
-                                            </tr>
-
-                                        ))}
-                                        
-                                    </tbody>
-                                    </table>
-                                </>
-                            )}
-                            {slots?.length === 0 ? (
-                                <p>No hay turnos libres</p>
-                            ) : (
-                                <>
-                                    <h3>Turnos libres</h3>
-                                    <table className="table table-striped table-hover">
-                                    <thead style={{ position: 'sticky',
-                                    top: 55,
-                                    zIndex: 2,
-                                    backgroundColor: 'var(--bs-light)', }}>
-                                    <tr>
-                                        <th scope="col" className='text-center'>Hora de entrada</th>
-                                        <th scope="col" className='text-center'>Hora de finalizacion</th>
-                                        
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        {slots.map((slot) => (
-                                            <tr key={slot.id}>
-                                                <td className='text-center'>
-                                                    {slot.startTime}
-                                                </td>
-                                                <td className='text-center'>
-                                                    {slot.finishTime}
-                                                </td>
-                                                
-                                            </tr>
-
-                                        ))}
-                                        
-                                    </tbody>
-                                    </table>
-                                </>
-                            )}
-                         
-                         </div>
+                        <>
+                        <div className='d-flex flex-column'
+                        style={{maxWith:"80%", margin:"0 auto"}}>
                             
-                    )}
-                )}
+                            <SportFieldReservationCardComponent 
+                            
+                            key={sportField.id}
+                            sportField={sportField}
+                            reservations={reservations}
+                            slots={slots}
+                            handleCancelReservation={handleCancelReservation}
+                            getRowClass={getRowClass}
+                        />
+                        </div>
+                        </>
+                        
+                    )
+                })}
             </div>
         )}
     </div>

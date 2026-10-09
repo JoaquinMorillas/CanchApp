@@ -20,6 +20,7 @@ import com.joaquin.CanchApp.dto.SlotDTO;
 
 import com.joaquin.CanchApp.entity.Reservation;
 import com.joaquin.CanchApp.entity.ReservationStatus;
+import com.joaquin.CanchApp.entity.Role;
 import com.joaquin.CanchApp.entity.Slot;
 import com.joaquin.CanchApp.entity.SportField;
 import com.joaquin.CanchApp.entity.User;
@@ -31,6 +32,7 @@ import com.joaquin.CanchApp.exception.ReservationUserIsNullException;
 import com.joaquin.CanchApp.exception.SportFieldIdNotFoundException;
 
 import com.joaquin.CanchApp.exception.UserIdNotFoundException;
+import com.joaquin.CanchApp.exception.UserIsNotTheOwnerException;
 import com.joaquin.CanchApp.mapper.ReservationMapper;
 import com.joaquin.CanchApp.mapper.SlotMapper;
 import com.joaquin.CanchApp.repository.ReservationRepository;
@@ -63,70 +65,6 @@ public class ReservationService {
             return dtos;
             
 
-            /*
-            
-                Optional<SportField> sportFieldDTO = sportFieldRepository.findById(sportFieldId);
-                AvailabilityDTO availabilityDTOForSpecificDate = availabilityService.findBySportFieldIdAndSpecificDate(sportFieldId, date);
-                
-                if(availabilityDTOForSpecificDate != null){
-                    Duration duration = sportFieldDTO.get().getReservationDuration();
-                    LocalTime beginingTime = availabilityDTOForSpecificDate.getBeginingTime();
-                    LocalTime endingTime = availabilityDTOForSpecificDate.getEndingTime();
-                    
-                    while(!beginingTime.plus(duration).isAfter(endingTime)|| beginingTime.plus(duration).equals(endingTime)){
-                        LocalTime endTime = beginingTime.plus(duration);
-                        slots.add(new SlotDTO(sportFieldId, beginingTime, endTime, false));
-                        beginingTime = endTime;
-                    }
-
-                    for(SlotDTO slotDTO : slots){
-                        for(ReservationDTO reservation: reservations){
-                        if(reservation.getReservationStatus() == ReservationStatus.CONFIRMED){
-                                slotDTO.setReserved(true);
-                                
-                            }
-                        }
-                    }
-                }else{
-
-                    List<AvailabilityDTO> availabilities = availabilityService.findBySportFieldId(sportFieldId);
-                    AvailabilityDTO todayAvailabilityDTO = null;
-                    for(AvailabilityDTO availabilityDTO: availabilities){
-                        if(availabilityDTO.getDayOfWeek().equals(date.getDayOfWeek())){
-                            todayAvailabilityDTO = availabilityDTO;
-                        }
-                    }
-                    if(todayAvailabilityDTO == null){
-                        return slots;
-                    }
-                    Duration duration = sportFieldDTO.get().getReservationDuration();
-                    LocalTime beginingTime = todayAvailabilityDTO.getBeginingTime();
-                    LocalTime endingTime = todayAvailabilityDTO.getEndingTime();
-
-                    
-                    while(beginingTime.plus(duration).isBefore(endingTime) || beginingTime.plus(duration).equals(endingTime)){
-                    
-                        if(beginingTime.plus(duration).equals(LocalTime.MIDNIGHT)|| beginingTime.plus(duration).isBefore(beginingTime)){
-                            break;
-                        }
-                        LocalTime endSlot = beginingTime.plus(duration);
-                        slots.add(new SlotDTO(sportFieldId, beginingTime, endSlot, false));
-                        beginingTime = endSlot;
-
-                    }
-
-                    for(SlotDTO slotsDTO : slots){
-                        for(ReservationDTO reservation: reservations){
-                            if(reservation.getBeginingHour() == slotsDTO.getBeginingTime() && 
-                            reservation.getReservationStatus() == ReservationStatus.CONFIRMED){
-                                slotsDTO.setReserved(true);
-                            }
-                        }
-                    }
-                    
-                }
-                return slots;
-            */
         }
 
         // this method returns all the reservation DTO to be used later for the owner to be able to see the user that made the reservation
@@ -140,54 +78,26 @@ public class ReservationService {
 
             return dtos;
         }
-        /*Deprecated now it is used confirmReservation
-        * 
-        * 
-        public ReservationDTO saveReservation(ReservationDTO dto) throws UserIdNotFoundException, SportFieldIdNotFoundException, StablishmentIdNotFoundException, DurationLenghtDifferentFromExpected, ReservationBeginingHourNotAvailableException{
-            
-            User user = userRepository.findById(dto.getUserId())
-            .orElseThrow(() -> new UserIdNotFoundException(dto.getUserId()));
-    
-            SportField sportField = sportFieldRepository.findById(dto.getStablishmentId())
-            .orElseThrow(()-> new SportFieldIdNotFoundException(dto.getStablishmentId()));
-            
-            List<SlotDTO> slots = getSlots(sportField.getId(), dto.getReservationDate());
-            // check duration
-            if(reservationValidation.checkReservationDuration(dto, slots) != true){
-                throw new DurationLenghtDifferentFromExpected(sportField.getReservationDuration(), dto.getBeginingHour(), dto.getFinishingHour());
-            }
-            //check if begining time corresponds with an available slot
-            if(reservationValidation.checkBeginingHour(dto, slots) != true){
-                throw new ReservationBeginingHourNotAvailableException(dto.getBeginingHour()); 
-            }
-    
-            Reservation reservationToSave = Reservation.builder()
-            .user(user)
-            .sportField(sportField)
-            .reservationDate(dto.getReservationDate())
-            .startTime(dto.getBeginingHour())
-            .finishTime(dto.getFinishingHour())
-            .reservationStatus(ReservationStatus.CONFIRMED)
-            .createdAt(LocalDateTime.now())
-            .build();
-    
-            reservationRepository.save(reservationToSave);
-    
-            return ReservationMapper.toDTO(reservationToSave);
-        }
-        */
+        
 
         // this is used in the fronted to create all the reservation between two given dates
         public List<SlotDTO> generateSlotsForDateRange (Integer sportFieldId,
-                                                                LocalDate beginingDate,
-                                                                LocalDate endingDate) 
-                                                                throws SportFieldIdNotFoundException{
+                                                        LocalDate beginingDate,
+                                                        LocalDate endingDate,
+                                                        User user) 
+                                                        throws SportFieldIdNotFoundException, UserIsNotTheOwnerException{
 
             List<Slot> createdSlots = new ArrayList<>();
 
             SportField sportField = sportFieldRepository.findById(sportFieldId)
             .orElseThrow(() -> new SportFieldIdNotFoundException(sportFieldId));
 
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            boolean isOwner = user.getId().equals(sportField.getStablishment().getOwner().getId());
+            boolean canCreateSlots = isAdmin || isOwner;                                                            
+            if(!canCreateSlots){
+                throw new UserIsNotTheOwnerException();
+            }
             Duration duration = sportField.getReservationDuration();
 
             for(LocalDate date = beginingDate; !date.isAfter(endingDate); date = date.plusDays(1)){
@@ -251,7 +161,13 @@ public class ReservationService {
 
         }
 
-        public List<ReservationDTO> findByUser(Integer userId){
+        public List<ReservationDTO> findByUser(Integer userId, User user) throws UserIsNotTheOwnerException{
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            boolean isUser = user.getId().equals(userId);
+            boolean canFind = isAdmin || isUser;
+            if(!canFind){
+                throw new UserIsNotTheOwnerException();
+            }
             List<Reservation> reservations = reservationRepository.findByUserId(userId);
             List<ReservationDTO> dtos = new ArrayList<>();
 
@@ -265,8 +181,8 @@ public class ReservationService {
 
         public ReservationDTO cancelReservation(
             Integer reservationId, 
-            Integer userId) 
-            throws ReservationIdNotFoundException, ReservationUserIdIsDiferentFromTheIdSuppliedException, ReservationUserIsNullException{
+            User user) 
+            throws ReservationIdNotFoundException, ReservationUserIsNullException, UserIsNotTheOwnerException{
             
             Reservation searchedReservation = reservationRepository.findById(reservationId)
             .orElseThrow(()-> new ReservationIdNotFoundException(reservationId));
@@ -274,10 +190,15 @@ public class ReservationService {
             if(searchedReservation.getUser() == null){
                 throw new ReservationUserIsNullException();
             }
-            if((!searchedReservation.getUser().getId().equals(userId))&&(!searchedReservation.getSportField().getStablishment().getOwner().getId().equals(userId))){
-                System.out.println("userId getted: " + userId);
-                System.out.println("ownerId: " + userId);
-                throw new ReservationUserIdIsDiferentFromTheIdSuppliedException();
+
+            boolean isUser = searchedReservation.getUser().getId().equals(user.getId());
+            boolean isOwner = searchedReservation.getSportField().getStablishment().getOwner().getId().equals(user.getId());
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+
+            boolean canCancel = isUser || isOwner || isAdmin;
+            if(!canCancel){
+                
+                throw new UserIsNotTheOwnerException();
             }
             
 
@@ -307,14 +228,13 @@ public class ReservationService {
         }
 
         public ReservationDTO confirmReservarion(Integer slotId, 
-            Integer userId) 
+            User user) 
             throws ReservationIdNotFoundException, UserIdNotFoundException, ReservationIsAlreadyConfirmedException, ReservationDateIsBeforeCurrentDate{
 
             Slot searchedSlot = slotRepository.findById(slotId)
             .orElseThrow(() -> new ReservationIdNotFoundException(slotId));
             
-            User searchedUser = userRepository.findById(userId)
-            .orElseThrow(() -> new UserIdNotFoundException(userId));
+            
 
             if(!searchedSlot.isAvailable()){
                 throw new ReservationIsAlreadyConfirmedException();
@@ -327,7 +247,7 @@ public class ReservationService {
             
             searchedSlot.setAvailable(false);
             Reservation savedReservation = Reservation.builder()
-                                            .user(searchedUser)
+                                            .user(user)
                                             .sportField(searchedSlot.getSportField())
                                             .reservationDate(searchedSlot.getReservationDate())
                                             .startTime(searchedSlot.getStartTime())
@@ -345,8 +265,8 @@ public class ReservationService {
                             + " " + savedReservation.getSportField().getStablishment().getAddress().getNumber()
                             + ", "  + savedReservation.getSportField().getStablishment().getAddress().getCity();
             emailService.sendConfirmReservarionEmail(
-                searchedUser.getEmail(), 
-                searchedUser.getFirstName(), 
+                user.getEmail(), 
+                user.getFirstName(), 
                 savedReservation.getSportField().getName(), 
                 savedReservation.getSportField().getStablishment().getName(), 
                 formatedDate, 
