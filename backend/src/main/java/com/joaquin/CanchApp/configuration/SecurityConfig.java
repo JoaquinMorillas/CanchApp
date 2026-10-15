@@ -81,7 +81,7 @@ public class SecurityConfig {
         System.out.println("Allowed frontend origin: [" + frontendUrl + "]");
         
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl)); // frontend
+        configuration.setAllowedOrigins(List.of(frontendUrl).trim()); // frontend
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
