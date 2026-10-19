@@ -74,7 +74,7 @@ public class AuthService {
         try{
             emailService.sendRegisterEmail(userToSave.getUsername(), userToSave.getFirstName());
         } catch (Exception e){
-            System.err.println("No se pudo enviar email: " + e.getMessage())
+            System.err.println("No se pudo enviar email: " + e.getMessage());
         }
         
         return AuthResponse.builder()
