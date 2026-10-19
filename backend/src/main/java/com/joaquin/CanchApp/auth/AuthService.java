@@ -71,8 +71,11 @@ public class AuthService {
 
         String accessToken = jwtService.generateAccessToken(userToSave.getUsername(),buildClaims(userToSave));
         String refreshToken = jwtService.generateRefreshToken(userToSave.getUsername());
-
-        emailService.sendRegisterEmail(userToSave.getUsername(), userToSave.getFirstName());
+        try{
+            emailService.sendRegisterEmail(userToSave.getUsername(), userToSave.getFirstName());
+        } catch (Exception e){
+            System.err.println("No se pudo enviar email: " + e.getMessage())
+        }
         
         return AuthResponse.builder()
         .accessToken(accessToken)
