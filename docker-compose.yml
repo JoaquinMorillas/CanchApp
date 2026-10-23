@@ -39,7 +39,10 @@ services:
       FRONTEND_URL: ${FRONTEND_URL}
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     container_name: canchapp-frontend
     restart: always
     ports:
