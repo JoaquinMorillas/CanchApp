@@ -1,10 +1,10 @@
 
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import {jwtDecode }from "jwt-decode"
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { startLoading, stopLoading} from "./LoadingContext"
+import { LoadingContext } from "./LoadingContext"
 
 export const AuthContext = createContext()
 
@@ -14,6 +14,7 @@ export const AuthProvider = ({children}) =>{
     const baseUrl = import.meta.env.VITE_API_URL
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
+    const {startLoading, stopLoading} = useContext(LoadingContext)
 
     /*
     For developing the refreshToken is set on localStorage. but

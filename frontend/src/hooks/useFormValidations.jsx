@@ -19,8 +19,7 @@ export const useFormValidations = (validators) => {
 
   const handleBlur = (field, value) => {
     setErrors(prev => ({...prev, [field]: validateField(field, value)}))
-    console.log(value)
-    console.log(errors)
+    
   }
 
   return {errors,validateAll, handleBlur}

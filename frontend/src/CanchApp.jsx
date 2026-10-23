@@ -35,59 +35,62 @@ export const CanchApp = () =>{
     
     return(
         <>
-        <AuthProvider>
-        
-            <StablishmentProvider>
-                <LoadingProvider>
+         <LoadingProvider>
 
-                
+            <AuthProvider>
+            
+                <StablishmentProvider>
+                    <LoadingProvider>
 
-                <HeaderComponent />
-                        
-                        <Routes>
-                            {/* Protected Routes for ADMIN or OWNER*/}
-                            <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN", "ROLE_OWNER"]}/>}>
-                                <Route path="/administracion" element={<AdministrationPage />}/>
-                                <Route path="/administracion/agregar_establecimiento" element={<AddStablishmentPage />} />
-                                <Route path='/administracion/establecimientos/:id/agregar_cancha' element={<AddSportFieldPage />} />
-                                <Route path='/administracion/establecimientos/editar/:id' element={<EditStablishment />} />
-                                <Route path='/administracion/canchas/editar/:id' element={<EditSportFieldPage />} />
-                                <Route path='/administracion/canchas/editar/disponibilidad/:id' element={<EditAvailability />} />
-                                <Route path='/administracion/canchas/editar/:id/crear_disponibilidad/:day' element={<AddAvailability />} />
-                                <Route path='/administracion/canchas/editar/:id/crear_disponibilidades' element={<AddAvailabilities />} />
-                                <Route path='/administracion/canchas/editar/:id/crear_reservas' element={<AddReservations />} />
-                                <Route path='/administracion/reservas' element={<AdminReservations />} />
-                            </Route>
-                            {/* Protected Routes for ADMIN*/}
-                            <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN"]}/>}>
-                                <Route path='/administracion/usuarios' element={<AdminUsers />}/>
-                                <Route path='administracion/deportes' element={<EditSportsPage />}/>
-                                <Route path='administracion/politicas' element={<PoliciesPage />}/>
-                                <Route path='administracion/caracteristicas' element={<AmenitiesPage />}/>
-                            </Route>
-                            
-                            {/* Protected Routes for anyone registered*/}
-                            <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER"]}/>}>
-                                <Route path='/perfil' element={<UserInfoPage />}/>
-                                <Route path='/establecimientos/:id/:sport/reservar' element={<ReserveByStablishmentAndSportPage />} />
-                            </Route>
-                            {/*Public Routes*/}
-                            <Route path='/establecimientos/:id' element={<StablishmentInfo />} />
-                            <Route path='/establecimientos/buscar/:sport' element={<SearchStablishmentsBySport />} />
-                            <Route path='/canchas/reservar/:sport/:city/:date' element={<ReserveByCitySportAndDate />} />
-                            
-                            <Route path='/' element={<HomePage />} /> 
-                            <Route path='/login' element={<LoginPage />} /> 
-                            <Route path='/register' element={<RegisterPage />}/>
-                            
-                            <Route path='*' element={<NotFoundPage />} /> 
-                            <Route path='/no_autorizado' element={<Unauthorized />}/>
-                        </Routes>
                     
-                    <FooterComponent />
-                    </LoadingProvider>
-            </StablishmentProvider>
-        </AuthProvider>
+
+                    <HeaderComponent />
+                            
+                            <Routes>
+                                {/* Protected Routes for ADMIN or OWNER*/}
+                                <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN", "ROLE_OWNER"]}/>}>
+                                    <Route path="/administracion" element={<AdministrationPage />}/>
+                                    <Route path="/administracion/agregar_establecimiento" element={<AddStablishmentPage />} />
+                                    <Route path='/administracion/establecimientos/:id/agregar_cancha' element={<AddSportFieldPage />} />
+                                    <Route path='/administracion/establecimientos/editar/:id' element={<EditStablishment />} />
+                                    <Route path='/administracion/canchas/editar/:id' element={<EditSportFieldPage />} />
+                                    <Route path='/administracion/canchas/editar/disponibilidad/:id' element={<EditAvailability />} />
+                                    <Route path='/administracion/canchas/editar/:id/crear_disponibilidad/:day' element={<AddAvailability />} />
+                                    <Route path='/administracion/canchas/editar/:id/crear_disponibilidades' element={<AddAvailabilities />} />
+                                    <Route path='/administracion/canchas/editar/:id/crear_reservas' element={<AddReservations />} />
+                                    <Route path='/administracion/reservas' element={<AdminReservations />} />
+                                </Route>
+                                {/* Protected Routes for ADMIN*/}
+                                <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN"]}/>}>
+                                    <Route path='/administracion/usuarios' element={<AdminUsers />}/>
+                                    <Route path='administracion/deportes' element={<EditSportsPage />}/>
+                                    <Route path='administracion/politicas' element={<PoliciesPage />}/>
+                                    <Route path='administracion/caracteristicas' element={<AmenitiesPage />}/>
+                                </Route>
+                                
+                                {/* Protected Routes for anyone registered*/}
+                                <Route element={<ProtectedRoute authRoles={["ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER"]}/>}>
+                                    <Route path='/perfil' element={<UserInfoPage />}/>
+                                    <Route path='/establecimientos/:id/:sport/reservar' element={<ReserveByStablishmentAndSportPage />} />
+                                </Route>
+                                {/*Public Routes*/}
+                                <Route path='/establecimientos/:id' element={<StablishmentInfo />} />
+                                <Route path='/establecimientos/buscar/:sport' element={<SearchStablishmentsBySport />} />
+                                <Route path='/canchas/reservar/:sport/:city/:date' element={<ReserveByCitySportAndDate />} />
+                                
+                                <Route path='/' element={<HomePage />} /> 
+                                <Route path='/login' element={<LoginPage />} /> 
+                                <Route path='/register' element={<RegisterPage />}/>
+                                
+                                <Route path='*' element={<NotFoundPage />} /> 
+                                <Route path='/no_autorizado' element={<Unauthorized />}/>
+                            </Routes>
+                        
+                        <FooterComponent />
+                        </LoadingProvider>
+                </StablishmentProvider>
+            </AuthProvider>
+         </LoadingProvider>
         </>
         
     )
