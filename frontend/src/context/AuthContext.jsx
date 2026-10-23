@@ -4,6 +4,7 @@ import {jwtDecode }from "jwt-decode"
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { startLoading, stopLoading} from "./LoadingContext"
 
 export const AuthContext = createContext()
 
@@ -22,6 +23,7 @@ export const AuthProvider = ({children}) =>{
    
     const login = async (email, password) => {
         try{
+            startLoading()
             const response = await axios.post(baseUrl +"/auth/login",
                 {   
                     "email" :email, 
@@ -61,6 +63,9 @@ export const AuthProvider = ({children}) =>{
                 showCloseButton:true
             })
             return false
+        }
+        finally{
+            stopLoading()
         }   
     }
 
