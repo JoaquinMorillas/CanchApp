@@ -7,12 +7,13 @@ import { StablishmentCardPlaceholder } from './StablishmentCardPlaceholder';
 export const RecomendationsComponent = () => {
     const { stablishments }  = useContext(StablishmentContext);
     
+    
     const [shuffledStablishments, setShuffledStablishments] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
     const [isLoading, setIsLoading] = useState(false)
     const totalItemsPerPage = 10
 
-
+ 
     
   const shuffleStablishments = () =>{ 
     return [...stablishments.all].sort(() => Math.random() - 0.5)
@@ -24,6 +25,10 @@ export const RecomendationsComponent = () => {
     
   }, [stablishments.all])
 
+  useEffect(() => {
+    shuffledStablishments.length == 0 ? setIsLoading(true) : setIsLoading(false)
+    
+  }, [shuffledStablishments])
   
   const totalPages = Math.ceil(shuffledStablishments.length / totalItemsPerPage)
   const startIndex = (currentPage - 1) * totalItemsPerPage
