@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SportCardComponent } from './SportCardComponent'
 import { sportsInfo } from '../data/sportsInfo'
 import { useApi } from '../context/AxiosInstance'
+import { SportCardPlaceholder } from './SportCardPlaceholder'
 
 export const CategoriesComponent = () => {
   const api = useApi()
   const [sports, setSports] = useState([])
   const[shuffledSports, setShuffeledSports] = useState([])
   const scrollRef = useRef(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const scroll = (direction) => {
     const { current } = scrollRef;
@@ -25,10 +27,13 @@ export const CategoriesComponent = () => {
   
   useEffect(() => {
     const getSports = async() => {
+      setIsLoading(true)
+  
       const response = await api.get("/sport")
       const gettedSports = response.data
       setSports(gettedSports)
       setShuffeledSports(shuffleSports(gettedSports))
+      setIsLoading(false)
     }
     if(sports.length == 0){
       getSports()
@@ -54,14 +59,20 @@ export const CategoriesComponent = () => {
           ref={scrollRef}
           style={{ scrollBehavior: 'smooth', whiteSpace: 'nowrap' }}
         >
-          {shuffledSports.map((sport, index) => (
-            <div className="col" key={index}> 
-            <SportCardComponent 
-            width='250px'
-            sport={sport}
-            link={`/establecimientos/buscar/${sport.name}`}/>
-            </div>
-          ))}
+          {isLoading ? (
+            Array.from({length: 5}).map((_ , index) => (
+              <SportCardPlaceholder key={index}/>
+            ))
+          ):(
+            shuffledSports.map((sport, index) => (
+              <div className="col" key={index}> 
+              <SportCardComponent 
+              width='250px'
+              sport={sport}
+              link={`/establecimientos/buscar/${sport.name}`}/>
+              </div>
+            ))
+          )}
         </div>
          <button 
         className="btn btn-outline-primary position-absolute top-50 end-0 translate-middle-y z-1"

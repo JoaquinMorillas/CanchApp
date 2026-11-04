@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { useContext } from 'react';
 import { StablishmentContext } from '../context/StablishmentContext';
 import { StablishmentCardComponent } from './StablishmentCardComponent';
+import { StablishmentCardPlaceholder } from './StablishmentCardPlaceholder';
 
 export const RecomendationsComponent = () => {
     const { stablishments }  = useContext(StablishmentContext);
     
     const [shuffledStablishments, setShuffledStablishments] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
-
+    const [isLoading, setIsLoading] = useState(false)
     const totalItemsPerPage = 10
 
 
@@ -21,9 +22,9 @@ export const RecomendationsComponent = () => {
     
     setShuffledStablishments(shuffleStablishments())
     
-
   }, [stablishments.all])
 
+  
   const totalPages = Math.ceil(shuffledStablishments.length / totalItemsPerPage)
   const startIndex = (currentPage - 1) * totalItemsPerPage
   const endIndex = startIndex + totalItemsPerPage
@@ -37,12 +38,19 @@ export const RecomendationsComponent = () => {
      
       <div className="container">
         <div className="row row-cols-1 row-cols-md-2 g-4">
-          {currentItems.map((stablishment, index) => (
+          {isLoading ? (
+              Array.from({length: 6}).map((_ , index) => (
+                            <StablishmentCardPlaceholder key={index}/>
+                          ))
+          ):(
+
+          currentItems.map((stablishment, index) => (
             <div className="col" key={index}> 
               <StablishmentCardComponent
               stablishment={stablishment} />
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Pagination Controls */}
