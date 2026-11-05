@@ -5,6 +5,9 @@ import Swal from 'sweetalert2'
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { LoadingContext } from '../context/LoadingContext'
+import { SportCardPlaceholder } from '../Component/SportCardPlaceholder'
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export const ReserveByCitySportAndDate = () => {
     /* used States */
@@ -15,8 +18,10 @@ export const ReserveByCitySportAndDate = () => {
     const [sportFields, setSportFields] = useState([])
     const [slotsBySportFields, setSlotsBySportFields] = useState({})
     const [stablishmentsBySportFields, setStablishmentsBySportFields] = useState({})
+    const [fieldsLoading, setFieldsLoading] = useState(true)
+    const [selectedDate, setDate] = useState(dayjs(params.date).toDate())
+    const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD")
     
-
     /* handle the confirm reservation */
     const handleConfirmReservation = async(reservation) => {
         const confirm = await Swal.fire({
@@ -43,7 +48,7 @@ export const ReserveByCitySportAndDate = () => {
                     ...prev,
                     [sportFieldId] : prev[sportFieldId].map(slot =>
                         slot.id === reservation.id
-                        ? {...slot, avilable:false}
+                        ? {...slot, available:false}
                         : slot
                     )
                 }))
@@ -62,9 +67,10 @@ export const ReserveByCitySportAndDate = () => {
     to lower case and replace the "_" to " " */
     const formatSport = (sport) => {
         return sport
-            .toLowerCase()       
-            .replace(/_/g, " ")     
-            .replace(/\b\w/g, c => c.toUpperCase()); // capitalizes first letter of each word
+            .toLowerCase()
+            .split("_")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" ");
     }
 
     /* format the date to "YYYY-MM-DD" to "dddd D [de] MMMM" */
@@ -76,7 +82,9 @@ export const ReserveByCitySportAndDate = () => {
     useEffect(() => {
         const fetchSportFields= async () => {
             try{
+                setFieldsLoading(true)
                 startLoading()
+                
                 const response = await api.get(
                     `/sport_field/find?sport=${encodeURIComponent(params.sport)}&city=${encodeURIComponent(params.city)}`)
                 const gettedSportFields = response.data
@@ -88,6 +96,7 @@ export const ReserveByCitySportAndDate = () => {
                     icon: "error"
                 })
             }finally{
+                setFieldsLoading(false)
                 stopLoading()
             }
         }
@@ -105,7 +114,7 @@ export const ReserveByCitySportAndDate = () => {
                 startLoading()
                 await Promise.all(
                     sportFields.map(async (sportField) => {
-                        const response = await api.get(`/reservation/sport-field/${sportField.id}/slots?date=${params.date}`)
+                        const response = await api.get(`/reservation/sport-field/${sportField.id}/slots?date=${formattedDate}`)
                         const data = response.data
                         slots[sportField.id] = data || []
                     })
@@ -122,7 +131,7 @@ export const ReserveByCitySportAndDate = () => {
         if(sportFields.length > 0){
             fetchAllSlots()
         }
-    },[sportFields, params.date])
+    },[sportFields, formattedDate])
 
     /* fetch the stablishments assigned to the sportFields */
     useEffect(() => {
@@ -156,8 +165,23 @@ export const ReserveByCitySportAndDate = () => {
     <> 
     <div className="text-dark p-4 rounded" 
         style={{ backgroundColor: '#F8F9FA',  maxWidth: '100%', margin: '0 auto' }}>
-        <h3 className='text-center'>Canchas de {formatSport(params.sport)} disponibles para el día {formatDate(params.date)}</h3>
-        {sportFields.length > 0 ? (
+        <div className='text-center'>
+            <label className='form-label mb-5 me-3'>Fecha: </label>
+            <DatePicker
+              className='form-control'
+              selected={selectedDate}
+              onChange={(date) => date && setDate(date)}
+              placeholderText='Seleccioná una fecha'
+              dateFormat="yyyy-MM-dd"
+              minDate={new Date()}  
+            />
+        
+        </div>
+        <h3 className='text-center'>Canchas de {formatSport(params.sport)} disponibles para el día {formatDate(selectedDate)}</h3>
+        {fieldsLoading ? (
+            <SportCardPlaceholder />
+        ):
+        sportFields.length > 0 ? (
             <div className='row g-3' >
                 {sportFields.map((sportField) => {
                     const slots = slotsBySportFields[sportField.id] || []
@@ -201,7 +225,7 @@ export const ReserveByCitySportAndDate = () => {
                 )
             })}      
             </div>
-        ):("No hay canchas")}
+        ):(<h3 className='text-center mt-5'>No hay canchas</h3>)}
     </div>
     </>
   )

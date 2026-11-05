@@ -12,6 +12,7 @@ import { LeftArrowComponent } from '../Component/LeftArrowComponent'
 import { AuthContext } from '../context/AuthContext'
 import { LoadingContext } from '../context/LoadingContext'
 import { WhatsappButtonComponent } from '../Component/WhatsappButtonComponent'
+import { StablishmentCardPlaceholder } from '../Component/StablishmentCardPlaceholder'
 
 export const StablishmentInfo = () => {
     /* used States */
@@ -158,6 +159,7 @@ export const StablishmentInfo = () => {
     /* fetch the stablishment and set the states */
     useEffect(() => {
         const fetchStablishment = async () =>{
+            
             const response = await api.get(`/stablishment/${id}`)
             const gettedStablishment = response.data
             setStablishment(gettedStablishment)
@@ -437,6 +439,6 @@ export const StablishmentInfo = () => {
         </div>
     </div>
     </>
-    ): (<NotFoundPage />)
+    ): (<StablishmentCardPlaceholder />)
   )
 }

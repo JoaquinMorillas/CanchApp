@@ -46,7 +46,7 @@ export const ReserveByStablishmentAndSportPage = () => {
                       showCloseButton:true
                   })
                   const newSlotState = sportFieldsSlots.map((s) => s.id === reservation.id ? s={...s, available:false} : s)
-                  console.log(newSlotState)
+                  
                   setSportFieldsSlots(newSlotState)
               }catch(error){
                   Swal.fire({
@@ -68,6 +68,9 @@ export const ReserveByStablishmentAndSportPage = () => {
   useEffect(() => {
 
     const searchSlots = async () => {
+      if (sportFields.length === 0){
+        return
+      }
       if(!date){ /* checks if the date was inputted */
         Swal.fire({
           title: "Error",
@@ -79,7 +82,7 @@ export const ReserveByStablishmentAndSportPage = () => {
   
       try{
         startLoading()
-        const formattedDate = date.toISOString().split("T")[0]
+        const formattedDate = dayjs(date).format("YYYY-MM-DD")
   
         const allResponses = await Promise.all( /* awaits for all the sportFields to fetch their slots */
               sportFields.map( (sportField) => {
@@ -113,7 +116,7 @@ export const ReserveByStablishmentAndSportPage = () => {
       }
     }
     searchSlots()
-  },[date])
+  },[date, sportFields])
 
   /* fetchs the sportFields for the given sport and stablishment */
   useEffect(() => {
@@ -135,7 +138,7 @@ export const ReserveByStablishmentAndSportPage = () => {
       fetchData()
       
     }
-  },[params, sportFields])
+  },[params.id, params.sport])
   return (
     <>
     <div className="text-dark p-4 rounded" 
