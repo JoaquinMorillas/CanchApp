@@ -160,7 +160,7 @@ export const SearcherComponent = () => {
             />
 
           </div>
-          {/* TODO: ADD the button funcionality*/}
+         
           <div className="col-12 text-center mt-3"> 
             <button className='btn w-30 w-lg-auto btn-lg'
             style={{background:"var(--bs-warning)"}}

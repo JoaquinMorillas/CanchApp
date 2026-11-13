@@ -1,16 +1,22 @@
 services:
-  mysql:
-    image: mysql:8
+  postgres:
+    image: postgres:16
     container_name: canchapp-db
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=root 
-      - MYSQL_DATABASE=canchapp_db
+      - POSTGRES_DB=canchapp_db
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - TZ=America/Argentina/Buenos_Aires
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./CanchApp.sql:/docker-entrypoint-initdb.d/canchapp.sql
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U canchapp -d canchapp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     
   backend:
     build: ./backend
@@ -19,7 +25,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      - postgres
     environment:
       SPRING_DATASOURCE_URL: ${DB_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
@@ -51,4 +57,4 @@ services:
       - backend
 
 volumes:
-  mysql_data:
+  pg_data:

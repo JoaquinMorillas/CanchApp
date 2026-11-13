@@ -3,6 +3,7 @@ package com.joaquin.CanchApp.entity;
 
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +26,7 @@ public class Amenity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    
+    @Column(unique = true)
     private String name;
 
     private String iconUrl;
