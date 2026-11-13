@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { useFormValidations } from '../hooks/useFormValidations'
 import { FormFieldComponent } from '../Component/FormFieldComponent'
+import { LoadingContext } from '../context/LoadingContext'
+
 
 const validators = {
   email: (v) => {
@@ -23,6 +25,8 @@ const validators = {
 export const LoginPage = () => {
   const {user, setUser, token, setToken, login, logOut} = useContext(AuthContext)
   
+  const {startLoading, stopLoading} = useContext(LoadingContext)
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isVisible, setIsVisible] = useState(false)
@@ -31,28 +35,42 @@ export const LoginPage = () => {
   const {errors, handleBlur} = useFormValidations(validators)
 
   const handleLogIn = async() => {
-    if(!email){
-      await Swal.fire({
-        title: "Error",
-        text: "Debe ingresar un correo electrónico",
-        icon:"error",
-        showCloseButton:true
+      if(!email){
+        await Swal.fire({
+          title: "Error",
+          text: "Debe ingresar un correo electrónico",
+          icon:"error",
+          showCloseButton:true
+        })
+        return
+      }
+      if(!password){
+        await Swal.fire({
+          title: "Error",
+          text: "Debe ingresar una contraseña",
+          icon:"error",
+          showCloseButton:true
+        })
+        return
+      }
+      
+      try{
+      startLoading()
+      const success = await login(email, password)
+      if(success){
+        navigate(-1)
+        }
+
+    }catch (error){
+      Swal.fire({
+       title: "Error",
+       text: error.response?.data?.message || error.response?.data || error.message,
+       icon: "error"
       })
-      return
+    }finally{
+        
+        stopLoading()
     }
-    if(!password){
-      await Swal.fire({
-        title: "Error",
-        text: "Debe ingresar una contraseña",
-        icon:"error",
-        showCloseButton:true
-      })
-      return
-    }
-   const success = await login(email, password)
-   if(success){
-    navigate(-1)
-   }
   }
 
   return (

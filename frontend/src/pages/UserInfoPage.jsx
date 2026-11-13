@@ -107,6 +107,7 @@ export const UserInfoPage = () => {
     const getReservations = async () => {
       try{
         startLoading()
+        
         const response = await api.get(`/reservation/user/${user.id}`)
         const gettedReservations = response.data
         setReservations(gettedReservations)
@@ -128,6 +129,7 @@ export const UserInfoPage = () => {
     const getStablishments = async () => {
       try{
         startLoading()
+        
         const response = await api.get(`/stablishment/user/${user.id}`)
         const gettedStablishments = response.data
         setOwnedStablishments(gettedStablishments)
@@ -140,8 +142,10 @@ export const UserInfoPage = () => {
     }finally{
       stopLoading()
     }
-  }
+  } 
+  const delay = ms => new Promise(res => setTimeout(res, ms));
     
+    delay(50000)
     getReservations()
     getStablishments()
   }, [])

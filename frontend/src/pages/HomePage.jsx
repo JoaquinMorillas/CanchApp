@@ -13,7 +13,7 @@ export const HomePage = () =>{
 
         <SearcherComponent />
         <br />
-        {user?.favorites.length > 0 && (<FavoritesComponent />)}
+        {user?.favorites?.length > 0 && (<FavoritesComponent />)}
         <br />
         <CategoriesComponent />
         <br />

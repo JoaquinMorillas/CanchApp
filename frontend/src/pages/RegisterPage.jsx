@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import { InputComponent } from '../Component/InputComponent'
 import { FormFieldComponent } from '../Component/FormFieldComponent'
 import { useFormValidations } from '../hooks/useFormValidations'
+import { LoadingContext } from '../context/LoadingContext'
+
 
 export const RegisterPage = () => {
     const validators = {
@@ -33,6 +35,7 @@ export const RegisterPage = () => {
         }
     }
     const {register} = useContext(AuthContext)
+    const {startLoading, stopLoading} = useContext(LoadingContext)
     const {errors, handleBlur} = useFormValidations(validators)
     const navigate = useNavigate()
     
@@ -103,13 +106,24 @@ export const RegisterPage = () => {
             return
                     
         }
-        
-        const response = await register(firstName, lastName, email, password)
-        if(response){
-            setTimeout(() => {
-                navigate("/")
-            },10)
-        }
+        try{
+            startLoading()
+            const response = await register(firstName, lastName, email, password)
+            if(response){
+                setTimeout(() => {
+                    navigate("/")
+                },10)
+            }
+        }catch (error){
+              Swal.fire({
+               title: "Error",
+               text: error.response?.data?.message || error.response?.data || error.message,
+               icon: "error"
+              })
+            }finally{
+                
+                stopLoading()
+            }
     
     }
       return (

@@ -42,3 +42,8 @@ backend/src/main/resources/application.properties
 # Ignore environment variables
 .env
 frontend/.env
+
+# Archivos locales / sensibles
+/datos.sql
+/schema.sql
+frontend/nginx.conf
